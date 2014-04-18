@@ -1,0 +1,1153 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="UTF-8"><title>ScanlineCost</title><script type="text/javascript" src="elm-runtime.js"></script><script type="text/javascript">Elm.ScanlineCost = Elm.ScanlineCost || {};
+Elm.ScanlineCost.make = function (_elm)
+                        {
+                          "use strict";
+                          _elm.ScanlineCost = _elm.ScanlineCost || {};
+                          if (_elm.ScanlineCost.values)
+                          return _elm.ScanlineCost.values;
+                          var _N = Elm.Native,
+                              _U = _N.Utils.make(_elm),
+                              _L = _N.List.make(_elm),
+                              _E = _N.Error.make(_elm),
+                              $moduleName = "ScanlineCost";
+                          var Basics = Elm.Basics.make(_elm);
+                          var Color = Elm.Color.make(_elm);
+                          var Graphics = Graphics || {};
+                          Graphics.Collage = Elm.Graphics.Collage.make(_elm);
+                          var Graphics = Graphics || {};
+                          Graphics.Element = Elm.Graphics.Element.make(_elm);
+                          var List = Elm.List.make(_elm);
+                          var Maybe = Elm.Maybe.make(_elm);
+                          var Native = Native || {};
+                          Native.Json = Elm.Native.Json.make(_elm);
+                          var Native = Native || {};
+                          Native.Ports = Elm.Native.Ports.make(_elm);
+                          var Schedule = Elm.Schedule.make(_elm);
+                          var Signal = Elm.Signal.make(_elm);
+                          var Simulator = Elm.Simulator.make(_elm);
+                          var String = Elm.String.make(_elm);
+                          var Text = Elm.Text.make(_elm);
+                          var Time = Elm.Time.make(_elm);
+                          var Util = Elm.Util.make(_elm);
+                          var _op = {};
+                          var plotStaircaseGraph = F3(function (xscale,ylen,points)
+                                                      {
+                                                        return function ()
+                                                               {
+                                                                 var h = Basics.ceiling(ylen + xscale * 2);
+                                                                 var ylabels = _L.fromArray([Graphics.Collage.scale(xscale / 20)(Graphics.Collage.rotate(Basics.degrees(90))(Graphics.Collage.move({ctor: "_Tuple2", _0: (0 - xscale) / 2, _1: ylen / 2})(Graphics.Collage.toForm(Text.plainText("total number of loads")))))]);
+                                                                 var mkXLabel = function (_v0)
+                                                                                {
+                                                                                  return function ()
+                                                                                         {
+                                                                                           switch (_v0.ctor)
+                                                                                           {case
+                                                                                            "_Tuple2" :
+                                                                                              return Graphics.Collage.move({ctor: "_Tuple2", _0: xscale * (0.5 + Basics.toFloat(_v0._0)), _1: (0 - xscale) / 2})(Graphics.Collage.scale(xscale / 20)(Graphics.Collage.toForm(Text.plainText(_v0._1))));}
+                                                                                           _E.Case($moduleName,
+                                                                                                   "on line 42, column 28 to 120");
+                                                                                         }();
+                                                                                };
+                                                                 var xlabels = List.map(mkXLabel)(Util.enumerate(A2(List.map,
+                                                                                                                    Basics.fst,
+                                                                                                                    points)));
+                                                                 var lineWidth = 2;
+                                                                 var axesStyle = _U.replace([["width",
+                                                                                              lineWidth],
+                                                                                             ["join",
+                                                                                              Graphics.Collage.Smooth],
+                                                                                             ["cap",
+                                                                                              Graphics.Collage.Round]],
+                                                                                            Graphics.Collage.defaultLine);
+                                                                 var arrowpoint = Graphics.Collage.scale(lineWidth * 3)(Graphics.Collage.filled(Color.black)(Graphics.Collage.polygon(_L.fromArray([{ctor: "_Tuple2", _0: 0, _1: 0.7},
+                                                                                                                                                                                                    {ctor: "_Tuple2", _0: 0.6, _1: -0.3},
+                                                                                                                                                                                                    {ctor: "_Tuple2", _0: 0, _1: 0},
+                                                                                                                                                                                                    {ctor: "_Tuple2", _0: -0.6, _1: -0.3}]))));
+                                                                 var maxY = List.maximum(A2(List.map,
+                                                                                            Basics.snd,
+                                                                                            points));
+                                                                 var yscale = ylen / Basics.toFloat(maxY + 1);
+                                                                 var mkBar = function (_v4)
+                                                                             {
+                                                                               return function ()
+                                                                                      {
+                                                                                        switch (_v4.ctor)
+                                                                                        {case
+                                                                                         "_Tuple2" :
+                                                                                           return function ()
+                                                                                                  {
+                                                                                                    var y$ = Basics.toFloat(_v4._1) * yscale;
+                                                                                                    var x$ = Basics.toFloat(_v4._0) * xscale;
+                                                                                                    return Graphics.Collage.move({ctor: "_Tuple2", _0: x$ + xscale / 1.9, _1: y$ / 2})(Graphics.Collage.group(_L.fromArray([Graphics.Collage.filled(Color.blue)(A2(Graphics.Collage.rect,
+                                                                                                                                                                                                                                                                   xscale * 0.9,
+                                                                                                                                                                                                                                                                   y$)),
+                                                                                                                                                                                                                            Graphics.Collage.scale(xscale / 20)(Graphics.Collage.toForm(Text.plainText(String.show(_v4._1))))])));
+                                                                                                  }();}
+                                                                                        _E.Case($moduleName,
+                                                                                                "between lines 38 and 40");
+                                                                                      }();
+                                                                             };
+                                                                 var bars = List.map(mkBar)(List.filter(function (_v8)
+                                                                                                        {
+                                                                                                          return function ()
+                                                                                                                 {
+                                                                                                                   switch (_v8.ctor)
+                                                                                                                   {case
+                                                                                                                    "_Tuple2" :
+                                                                                                                      return _U.cmp(_v8._1,
+                                                                                                                                    0) > 0;}
+                                                                                                                   _E.Case($moduleName,
+                                                                                                                           "on line 36, column 47 to 52");
+                                                                                                                 }();
+                                                                                                        })(Util.enumerate(A2(List.map,
+                                                                                                                             Basics.snd,
+                                                                                                                             points))));
+                                                                 var noBars = List.length(points);
+                                                                 var xlen = Basics.toFloat(noBars) * xscale + xscale / 2;
+                                                                 var axes = List.map(function ($)
+                                                                                     {
+                                                                                       return Graphics.Collage.traced(axesStyle)(Graphics.Collage.path($));
+                                                                                     })(_L.fromArray([_L.fromArray([{ctor: "_Tuple2", _0: 0, _1: 0},
+                                                                                                                    {ctor: "_Tuple2", _0: 0, _1: ylen}]),
+                                                                                                      _L.fromArray([{ctor: "_Tuple2", _0: 0, _1: 0},
+                                                                                                                    {ctor: "_Tuple2", _0: xlen, _1: 0}])]));
+                                                                 var arrows = _L.fromArray([A2(Graphics.Collage.move,
+                                                                                               {ctor: "_Tuple2", _0: 0, _1: ylen},
+                                                                                               arrowpoint),
+                                                                                            Graphics.Collage.move({ctor: "_Tuple2", _0: xlen, _1: 0})(A2(Graphics.Collage.rotate,
+                                                                                                                                                         Basics.degrees(270),
+                                                                                                                                                         arrowpoint))]);
+                                                                 var w = Basics.ceiling(xlen + xscale * 2);
+                                                                 return A3(Graphics.Collage.collage,
+                                                                           w,
+                                                                           h,
+                                                                           _L.fromArray([Graphics.Collage.move({ctor: "_Tuple2", _0: (0 - xlen) / 2, _1: (0 - ylen) / 2})(Graphics.Collage.group(List.concat(_L.fromArray([arrows,
+                                                                                                                                                                                                                           bars,
+                                                                                                                                                                                                                           ylabels,
+                                                                                                                                                                                                                           xlabels,
+                                                                                                                                                                                                                           axes]))))]));
+                                                               }();
+                                                      });
+                          var plotScheduleCost = F3(function (noJobs,mem,schedule)
+                                                    {
+                                                      return function ()
+                                                             {
+                                                               var zeros = A2(Util.repeatN,
+                                                                              noJobs - List.length(schedule),
+                                                                              0);
+                                                               var cumulMisses = List.isEmpty(schedule) ? _L.fromArray([]) : List.scanl1(F2(function (x,
+                                                                                                                                                      y)
+                                                                                                                                            {
+                                                                                                                                              return x + y;
+                                                                                                                                            }))(A2(Simulator.cacheMisses,
+                                                                                                                                                   mem,
+                                                                                                                                                   schedule));
+                                                               var points = List.map(function (_v12)
+                                                                                     {
+                                                                                       return function ()
+                                                                                              {
+                                                                                                switch (_v12.ctor)
+                                                                                                {case
+                                                                                                 "_Tuple2" :
+                                                                                                   return {ctor: "_Tuple2", _0: String.show(_v12._0), _1: _v12._1};}
+                                                                                                _E.Case($moduleName,
+                                                                                                        "on line 16, column 34 to 43");
+                                                                                              }();
+                                                                                     })(A2(List.zip,
+                                                                                           _L.range(1,
+                                                                                                    noJobs),
+                                                                                           _L.append(cumulMisses,
+                                                                                                     zeros)));
+                                                               return A3(plotStaircaseGraph,
+                                                                         15,
+                                                                         300,
+                                                                         points);
+                                                             }();
+                                                    });
+                          var memSize = 5;
+                          var noStations = 8;
+                          var noJobs = Schedule.noJobs(noStations);
+                          var main = A3(plotScheduleCost,
+                                        noJobs,
+                                        memSize,
+                                        Schedule.scanline(noStations));
+                          _elm.ScanlineCost.values = {_op: _op, noStations: noStations, noJobs: noJobs, memSize: memSize, main: main, plotScheduleCost: plotScheduleCost, plotStaircaseGraph: plotStaircaseGraph};
+                          return _elm.ScanlineCost.values;
+                        };Elm.Simulator = Elm.Simulator || {};
+Elm.Simulator.make = function (_elm)
+                     {
+                       "use strict";
+                       _elm.Simulator = _elm.Simulator || {};
+                       if (_elm.Simulator.values)
+                       return _elm.Simulator.values;
+                       var _N = Elm.Native,
+                           _U = _N.Utils.make(_elm),
+                           _L = _N.List.make(_elm),
+                           _E = _N.Error.make(_elm),
+                           $moduleName = "Simulator";
+                       var Basics = Elm.Basics.make(_elm);
+                       var Color = Elm.Color.make(_elm);
+                       var Graphics = Graphics || {};
+                       Graphics.Collage = Elm.Graphics.Collage.make(_elm);
+                       var Graphics = Graphics || {};
+                       Graphics.Element = Elm.Graphics.Element.make(_elm);
+                       var List = Elm.List.make(_elm);
+                       var Maybe = Elm.Maybe.make(_elm);
+                       var Native = Native || {};
+                       Native.Json = Elm.Native.Json.make(_elm);
+                       var Native = Native || {};
+                       Native.Ports = Elm.Native.Ports.make(_elm);
+                       var Schedule = Elm.Schedule.make(_elm);
+                       var Signal = Elm.Signal.make(_elm);
+                       var String = Elm.String.make(_elm);
+                       var Text = Elm.Text.make(_elm);
+                       var Time = Elm.Time.make(_elm);
+                       var Util = Elm.Util.make(_elm);
+                       var _op = {};
+                       var remove = F2(function (i,_v0)
+                                       {
+                                         return function ()
+                                                {
+                                                  switch (_v0.ctor)
+                                                  {case
+                                                   "_Tuple2" :
+                                                     return {ctor: "_Tuple2", _0: _v0._0, _1: A2(List.filter,
+                                                                                                 function (j)
+                                                                                                 {
+                                                                                                   return ! _U.eq(i,
+                                                                                                                  j);
+                                                                                                 },
+                                                                                                 _v0._1)};}
+                                                  _E.Case($moduleName,
+                                                          "on line 58, column 26 to 58");
+                                                }();
+                                       });
+                       var contains = F2(function (_v4,i)
+                                         {
+                                           return function ()
+                                                  {
+                                                    switch (_v4.ctor)
+                                                    {case
+                                                     "_Tuple2" :
+                                                       return A2(List.any,
+                                                                 function (j)
+                                                                 {
+                                                                   return _U.eq(i,j);
+                                                                 },
+                                                                 _v4._1);}
+                                                    _E.Case($moduleName,
+                                                            "on line 55, column 27 to 54");
+                                                  }();
+                                         });
+                       var load = F2(function (i,_v8)
+                                     {
+                                       return function ()
+                                              {
+                                                switch (_v8.ctor)
+                                                {case
+                                                 "_Tuple2" :
+                                                   return A2(contains,
+                                                             {ctor: "_Tuple2", _0: _v8._0, _1: _v8._1},
+                                                             i) ? {ctor: "_Tuple2", _0: _v8._0, _1: {ctor: "::", _0: i, _1: A2(List.filter,
+                                                                                                                               function (j)
+                                                                                                                               {
+                                                                                                                                 return ! _U.eq(i,
+                                                                                                                                                j);
+                                                                                                                               },
+                                                                                                                               _v8._1)}} : _U.cmp(List.length(_v8._1),
+                                                                                                                                                  _v8._0) < 0 ? {ctor: "_Tuple2", _0: _v8._0, _1: {ctor: "::", _0: i, _1: _v8._1}} : {ctor: "_Tuple2", _0: _v8._0, _1: {ctor: "::", _0: i, _1: A2(List.take,
+                                                                                                                                                                                                                                                                                                  _v8._0 - 1,
+                                                                                                                                                                                                                                                                                                  _v8._1)}};}
+                                                _E.Case($moduleName,"between lines 62 and 64");
+                                              }();
+                                     });
+                       var emptyCache = function (size)
+                                        {
+                                          return {ctor: "_Tuple2", _0: size, _1: _L.fromArray([])};
+                                        };
+                       var cacheState = F2(function (mem,sched)
+                                           {
+                                             return function ()
+                                                    {
+                                                      var loadJob = function (_v12)
+                                                                    {
+                                                                      return function ()
+                                                                             {
+                                                                               switch (_v12.ctor)
+                                                                               {case
+                                                                                "_Tuple2" :
+                                                                                  return function ($)
+                                                                                         {
+                                                                                           return load(_v12._0)(load(_v12._1)($));
+                                                                                         };}
+                                                                               _E.Case($moduleName,
+                                                                                       "on line 32, column 25 to 40");
+                                                                             }();
+                                                                    };
+                                                      return A3(List.scanl,
+                                                                loadJob,
+                                                                emptyCache(mem),
+                                                                sched);
+                                                    }();
+                                           });
+                       var cacheMisses = F2(function (mem,sched)
+                                            {
+                                              return function ()
+                                                     {
+                                                       var toInt = function (b)
+                                                                   {
+                                                                     return b ? 0 : 1;
+                                                                   };
+                                                       var cntMisses = F2(function (_v16,cache)
+                                                                          {
+                                                                            return function ()
+                                                                                   {
+                                                                                     switch (_v16.ctor)
+                                                                                     {case
+                                                                                      "_Tuple2" :
+                                                                                        return toInt(A2(contains,
+                                                                                                        cache,
+                                                                                                        _v16._0)) + toInt(_U.eq(_v16._0,
+                                                                                                                                _v16._1) || A2(contains,
+                                                                                                                                               cache,
+                                                                                                                                               _v16._1));}
+                                                                                     _E.Case($moduleName,
+                                                                                             "on line 39, column 13 to 75");
+                                                                                   }();
+                                                                          });
+                                                       var caches = A2(cacheState,mem,sched);
+                                                       return A3(List.zipWith,
+                                                                 cntMisses,
+                                                                 sched,
+                                                                 caches);
+                                                     }();
+                                            });
+                       var totalCacheMisses = function (mem)
+                                              {
+                                                return function ($)
+                                                       {
+                                                         return List.sum(cacheMisses(mem)($));
+                                                       };
+                                              };
+                       var main = function ()
+                                  {
+                                    var stations = 8;
+                                    var schedule = Schedule.scanline(stations);
+                                    var scheduleElem = List.map(Text.asText)(schedule);
+                                    var noJobs = List.length(schedule);
+                                    var mem = 6;
+                                    var cstate = List.map(Basics.snd)(cacheState(mem)(schedule));
+                                    var cstateElem = A2(List.map,Text.asText,cstate);
+                                    var misses = cacheMisses(mem)(schedule);
+                                    var cumulMisses = A2(List.scanl1,
+                                                         F2(function (x,y)
+                                                            {
+                                                              return x + y;
+                                                            }),
+                                                         misses);
+                                    var missesElem = A2(List.map,Text.asText,cumulMisses);
+                                    return A2(Graphics.Element.flow,
+                                              Graphics.Element.down,
+                                              _L.fromArray([Graphics.Element.flow(Graphics.Element.right)(A2(List.zipWith,
+                                                                                                             Graphics.Element.above,
+                                                                                                             scheduleElem)(A3(List.zipWith,
+                                                                                                                              Graphics.Element.above,
+                                                                                                                              cstateElem,
+                                                                                                                              missesElem))),
+                                                            Text.asText(A2(Schedule.isCompleteSched,
+                                                                           stations,
+                                                                           schedule)),
+                                                            Text.asText(List.sum(misses))]));
+                                  }();
+                       _elm.Simulator.values = {_op: _op, main: main, cacheState: cacheState, cacheMisses: cacheMisses, totalCacheMisses: totalCacheMisses, emptyCache: emptyCache, contains: contains, remove: remove, load: load};
+                       return _elm.Simulator.values;
+                     };Elm.Schedule = Elm.Schedule || {};
+Elm.Schedule.make = function (_elm)
+                    {
+                      "use strict";
+                      _elm.Schedule = _elm.Schedule || {};
+                      if (_elm.Schedule.values)
+                      return _elm.Schedule.values;
+                      var _N = Elm.Native,
+                          _U = _N.Utils.make(_elm),
+                          _L = _N.List.make(_elm),
+                          _E = _N.Error.make(_elm),
+                          $moduleName = "Schedule";
+                      var Basics = Elm.Basics.make(_elm);
+                      var Color = Elm.Color.make(_elm);
+                      var Graphics = Graphics || {};
+                      Graphics.Collage = Elm.Graphics.Collage.make(_elm);
+                      var Graphics = Graphics || {};
+                      Graphics.Element = Elm.Graphics.Element.make(_elm);
+                      var List = Elm.List.make(_elm);
+                      var Maybe = Elm.Maybe.make(_elm);
+                      var Native = Native || {};
+                      Native.Json = Elm.Native.Json.make(_elm);
+                      var Native = Native || {};
+                      Native.Ports = Elm.Native.Ports.make(_elm);
+                      var Set = Elm.Set.make(_elm);
+                      var Signal = Elm.Signal.make(_elm);
+                      var String = Elm.String.make(_elm);
+                      var Text = Elm.Text.make(_elm);
+                      var Time = Elm.Time.make(_elm);
+                      var Util = Elm.Util.make(_elm);
+                      var _op = {};
+                      var drawSchedule = F3(function (jobDist,noStations,sched)
+                                            {
+                                              return function ()
+                                                     {
+                                                       var jobLabel = function ($)
+                                                                      {
+                                                                        return Graphics.Collage.scale(jobDist / 40)(Graphics.Collage.toForm(Text.plainText(String.show($))));
+                                                                      };
+                                                       var jobCoords = function (_v0)
+                                                                       {
+                                                                         return function ()
+                                                                                {
+                                                                                  switch (_v0.ctor)
+                                                                                  {case
+                                                                                   "_Tuple2" :
+                                                                                     return {ctor: "_Tuple2", _0: jobDist * (0.5 + Basics.toFloat(_v0._1) - Basics.toFloat(noStations) / 2 - 1), _1: (0 - jobDist) * (Basics.toFloat(_v0._0) - Basics.toFloat(noStations) / 2 - 0.5)};}
+                                                                                  _E.Case($moduleName,
+                                                                                          "on line 121, column 28 to 137");
+                                                                                }();
+                                                                       };
+                                                       var coords = A2(List.map,jobCoords,sched);
+                                                       var elemSize = jobDist * Basics.toFloat(noStations);
+                                                       var lineWidth = 2;
+                                                       var pathStyle = _U.replace([["width",
+                                                                                    lineWidth],
+                                                                                   ["join",
+                                                                                    Graphics.Collage.Smooth],
+                                                                                   ["cap",
+                                                                                    Graphics.Collage.Round]],
+                                                                                  Graphics.Collage.defaultLine);
+                                                       var schedPath = Graphics.Collage.traced(pathStyle)(Graphics.Collage.path(coords));
+                                                       var jobNumber = function (_v4)
+                                                                       {
+                                                                         return function ()
+                                                                                {
+                                                                                  switch (_v4.ctor)
+                                                                                  {case
+                                                                                   "_Tuple2" :
+                                                                                     return Graphics.Collage.move(_v4._1)(Graphics.Collage.group(_L.fromArray([Graphics.Collage.filled(Color.black)(Graphics.Collage.circle(jobDist / 3)),
+                                                                                                                                                               Graphics.Collage.filled(Color.white)(Graphics.Collage.circle(jobDist / 3 - lineWidth)),
+                                                                                                                                                               jobLabel(_v4._0)])));}
+                                                                                  _E.Case($moduleName,
+                                                                                          "between lines 125 and 126");
+                                                                                }();
+                                                                       };
+                                                       var jobs = A2(List.map,
+                                                                     jobNumber,
+                                                                     Util.enumerate(coords));
+                                                       return A3(Graphics.Collage.collage,
+                                                                 Basics.ceiling(elemSize),
+                                                                 Basics.ceiling(elemSize),
+                                                                 {ctor: "::", _0: schedPath, _1: jobs});
+                                                     }();
+                                            });
+                      var drawScheduleWithIndex = F3(function (jobDist,noStations,sched)
+                                                     {
+                                                       return function ()
+                                                              {
+                                                                var w = Basics.ceiling(jobDist);
+                                                                var mkCell = A3(Graphics.Element.container,
+                                                                                w,
+                                                                                w,
+                                                                                Graphics.Element.middle);
+                                                                var titleColumn = Graphics.Element.flow(Graphics.Element.down)(A2(List.map,
+                                                                                                                                  function ($)
+                                                                                                                                  {
+                                                                                                                                    return mkCell(Text.plainText(String.show($)));
+                                                                                                                                  },
+                                                                                                                                  _L.range(1,
+                                                                                                                                           noStations)));
+                                                                var titleRow = Graphics.Element.flow(Graphics.Element.right)({ctor: "::", _0: mkCell(A2(Graphics.Element.spacer,
+                                                                                                                                                        w,
+                                                                                                                                                        w)), _1: A2(List.map,
+                                                                                                                                                                    function ($)
+                                                                                                                                                                    {
+                                                                                                                                                                      return mkCell(Text.plainText(String.show($)));
+                                                                                                                                                                    },
+                                                                                                                                                                    _L.range(1,
+                                                                                                                                                                             noStations))});
+                                                                var path = A3(drawSchedule,
+                                                                              jobDist,
+                                                                              noStations,
+                                                                              sched);
+                                                                return A2(Graphics.Element.above,
+                                                                          A2(Graphics.Element.above,
+                                                                             titleRow,
+                                                                             A2(Graphics.Element.beside,
+                                                                                A2(Graphics.Element.beside,
+                                                                                   titleColumn,
+                                                                                   path),
+                                                                                titleColumn)),
+                                                                          titleRow);
+                                                              }();
+                                                     });
+                      var noJobs = function (noStations)
+                                   {
+                                     return ((noStations * noStations - noStations) / 2 | 0) + noStations;
+                                   };
+                      var orderJob = function (_v8)
+                                     {
+                                       return function ()
+                                              {
+                                                switch (_v8.ctor)
+                                                {case
+                                                 "_Tuple2" :
+                                                   return _U.cmp(_v8._0,
+                                                                 _v8._1) > -1 ? {ctor: "_Tuple2", _0: _v8._0, _1: _v8._1} : {ctor: "_Tuple2", _0: _v8._1, _1: _v8._0};}
+                                                _E.Case($moduleName,"on line 79, column 18 to 49");
+                                              }();
+                                     };
+                      var append = F2(function (_v12,sched)
+                                      {
+                                        return function ()
+                                               {
+                                                 switch (_v12.ctor)
+                                                 {case
+                                                  "_Tuple2" :
+                                                    return function ()
+                                                           {
+                                                             switch (sched.ctor)
+                                                             {case
+                                                              "::" :
+                                                                switch (sched._0.ctor)
+                                                                {case
+                                                                 "_Tuple2" :
+                                                                   return _U.eq({ctor: "_Tuple2", _0: _v12._0, _1: _v12._1},
+                                                                                {ctor: "_Tuple2", _0: sched._0._0, _1: sched._0._1}) || _U.eq({ctor: "_Tuple2", _0: _v12._1, _1: _v12._0},
+                                                                                                                                              {ctor: "_Tuple2", _0: sched._0._0, _1: sched._0._1}) ? A2(append,
+                                                                                                                                                                                                        {ctor: "_Tuple2", _0: _v12._0, _1: _v12._1},
+                                                                                                                                                                                                        sched._1) : {ctor: "::", _0: {ctor: "_Tuple2", _0: sched._0._0, _1: sched._0._1}, _1: A2(append,
+                                                                                                                                                                                                                                                                                                 {ctor: "_Tuple2", _0: _v12._0, _1: _v12._1},
+                                                                                                                                                                                                                                                                                                 sched._1)};}
+                                                                break;
+                                                              case
+                                                              "[]" :
+                                                                return _L.fromArray([orderJob({ctor: "_Tuple2", _0: _v12._0, _1: _v12._1})]);}
+                                                             _E.Case($moduleName,
+                                                                     "between lines 86 and 90");
+                                                           }();}
+                                                 _E.Case($moduleName,"between lines 86 and 90");
+                                               }();
+                                      });
+                      var contains = F2(function (sched,job)
+                                        {
+                                          return function ()
+                                                 {
+                                                   var job$ = orderJob(job);
+                                                   return A2(List.any,
+                                                             F2(function (x,y)
+                                                                {
+                                                                  return _U.eq(x,y);
+                                                                })(job$),
+                                                             sched);
+                                                 }();
+                                        });
+                      var remove = function (job)
+                                   {
+                                     return function ()
+                                            {
+                                              var job$ = orderJob(job);
+                                              return List.filter(F2(function (x,y)
+                                                                    {
+                                                                      return ! _U.eq(x,y);
+                                                                    })(job$));
+                                            }();
+                                   };
+                      var orderJobs = List.map(orderJob);
+                      var removeDups = function ()
+                                       {
+                                         var trav = F2(function (visited,sched)
+                                                       {
+                                                         return function ()
+                                                                {
+                                                                  switch (sched.ctor)
+                                                                  {case
+                                                                   "::" :
+                                                                     return function ()
+                                                                            {
+                                                                              var ojob = orderJob(sched._0);
+                                                                              var visited$ = A2(Set.insert,
+                                                                                                ojob,
+                                                                                                visited);
+                                                                              return A2(Set.member,
+                                                                                        ojob,
+                                                                                        visited) ? A2(trav,
+                                                                                                      visited,
+                                                                                                      sched._1) : {ctor: "::", _0: sched._0, _1: A2(trav,
+                                                                                                                                                    visited$,
+                                                                                                                                                    sched._1)};
+                                                                            }();
+                                                                   case
+                                                                   "[]" :
+                                                                     return _L.fromArray([]);}
+                                                                  _E.Case($moduleName,
+                                                                          "between lines 68 and 74");
+                                                                }();
+                                                       });
+                                         return trav(Set.empty);
+                                       }();
+                      var isCompleteSched = F2(function (noStations,sched)
+                                               {
+                                                 return function ()
+                                                        {
+                                                          var noUniqueJobs = List.length(Set.toList(Set.fromList(orderJobs(sched))));
+                                                          var isInRange = F3(function (from,upto,i)
+                                                                             {
+                                                                               return _U.cmp(i,
+                                                                                             from) > -1 && _U.cmp(i,
+                                                                                                                  upto) < 0;
+                                                                             });
+                                                          var validStations = A2(List.all,
+                                                                                 function (_v24)
+                                                                                 {
+                                                                                   return function ()
+                                                                                          {
+                                                                                            switch (_v24.ctor)
+                                                                                            {case
+                                                                                             "_Tuple2" :
+                                                                                               return A2(List.all,
+                                                                                                         A2(isInRange,
+                                                                                                            1,
+                                                                                                            noStations + 1),
+                                                                                                         _L.fromArray([_v24._0,
+                                                                                                                       _v24._1]));}
+                                                                                            _E.Case($moduleName,
+                                                                                                    "on line 60, column 40 to 78");
+                                                                                          }();
+                                                                                 },
+                                                                                 sched);
+                                                          return validStations && _U.eq(noUniqueJobs,
+                                                                                        noJobs(noStations));
+                                                        }();
+                                               });
+                      var closestGen = function (n)
+                                       {
+                                         return Basics.floor(Basics.logBase(2)(Basics.toFloat(n))) - 2;
+                                       };
+                      var addSteps = F2(function (_v28,_v29)
+                                        {
+                                          return function ()
+                                                 {
+                                                   switch (_v29.ctor)
+                                                   {case
+                                                    "_Tuple2" :
+                                                      return function ()
+                                                             {
+                                                               switch (_v28.ctor)
+                                                               {case
+                                                                "_Tuple2" :
+                                                                  return {ctor: "_Tuple2", _0: _v28._0 + _v29._0, _1: _v28._1 + _v29._1};}
+                                                               _E.Case($moduleName,
+                                                                       "on line 29, column 27 to 41");
+                                                             }();}
+                                                   _E.Case($moduleName,
+                                                           "on line 29, column 27 to 41");
+                                                 }();
+                                        });
+                      var rotate180cw = function (_v36)
+                                        {
+                                          return function ()
+                                                 {
+                                                   switch (_v36.ctor)
+                                                   {case
+                                                    "_Tuple2" :
+                                                      return {ctor: "_Tuple2", _0: 0 - _v36._0, _1: 0 - _v36._1};}
+                                                   _E.Case($moduleName,
+                                                           "on line 27, column 22 to 27");
+                                                 }();
+                                        };
+                      var rightS = {ctor: "_Tuple2", _0: 1, _1: 0};
+                      var leftS = {ctor: "_Tuple2", _0: -1, _1: 0};
+                      var downS = {ctor: "_Tuple2", _0: 0, _1: 1};
+                      var upS = {ctor: "_Tuple2", _0: 0, _1: -1};
+                      var triangleI = function (n)
+                                      {
+                                        return _U.cmp(n,0) < 1 ? _L.fromArray([downS,
+                                                                               leftS,
+                                                                               upS,
+                                                                               leftS,
+                                                                               downS,
+                                                                               downS,
+                                                                               downS]) : _L.append(triangleI(n - 1),
+                                                                                                   {ctor: "::", _0: leftS, _1: _L.append(A2(List.map,
+                                                                                                                                            rotate180cw,
+                                                                                                                                            squareH(n - 1)),
+                                                                                                                                         {ctor: "::", _0: downS, _1: triangleI(n - 1)})});
+                                      };
+                      var squareH = function (n)
+                                    {
+                                      return _L.append(triangleH(n),
+                                                       {ctor: "::", _0: rightS, _1: A2(List.map,
+                                                                                       rotate180cw,
+                                                                                       triangleH(n))});
+                                    };
+                      var triangleH = function (n)
+                                      {
+                                        return _U.cmp(n,0) < 1 ? _L.fromArray([downS,
+                                                                               downS,
+                                                                               downS,
+                                                                               rightS,
+                                                                               upS,
+                                                                               rightS,
+                                                                               downS]) : _L.append(triangleH(n - 1),
+                                                                                                   {ctor: "::", _0: downS, _1: _L.append(squareI(n - 1),
+                                                                                                                                         {ctor: "::", _0: rightS, _1: triangleH(n - 1)})});
+                                      };
+                      var squareI = function (n)
+                                    {
+                                      return _L.append(triangleI(n),
+                                                       {ctor: "::", _0: rightS, _1: A2(List.map,
+                                                                                       rotate180cw,
+                                                                                       triangleI(n))});
+                                    };
+                      var sierpTriangle = function (n)
+                                          {
+                                            return _U.cmp(n,0) < 1 ? _L.fromArray([rightS,
+                                                                                   downS,
+                                                                                   rightS,
+                                                                                   upS,
+                                                                                   rightS,
+                                                                                   downS,
+                                                                                   downS,
+                                                                                   leftS,
+                                                                                   {ctor: "_Tuple2", _0: 1, _1: 1}]) : _L.append(sierpTriangle(n - 1),
+                                                                                                                                 {ctor: "::", _0: rightS, _1: _L.append(List.reverse(squareI(n - 1)),
+                                                                                                                                                                        {ctor: "::", _0: {ctor: "_Tuple2", _0: -1, _1: 1}, _1: sierpTriangle(n - 1)})});
+                                          };
+                      var sierpinski = function ($)
+                                       {
+                                         return A2(List.scanl,
+                                                   addSteps,
+                                                   {ctor: "_Tuple2", _0: 1, _1: 1})(sierpTriangle(closestGen($)));
+                                       };
+                      var hindex = function ($)
+                                   {
+                                     return A2(List.scanl,
+                                               addSteps,
+                                               {ctor: "_Tuple2", _0: 1, _1: 1})(squareH(closestGen($)));
+                                   };
+                      var scanline = function (noStations)
+                                     {
+                                       return function ()
+                                              {
+                                                var mkRow = function (i)
+                                                            {
+                                                              return A2(List.map,
+                                                                        F2(function (v0,v1)
+                                                                           {
+                                                                             return {ctor: "_Tuple2", _0: v0, _1: v1};
+                                                                           })(i),
+                                                                        _L.range(1,i));
+                                                            };
+                                                return A2(List.concatMap,
+                                                          mkRow,
+                                                          _L.range(1,noStations));
+                                              }();
+                                     };
+                      var empty = _L.fromArray([]);
+                      _elm.Schedule.values = {_op: _op, empty: empty, scanline: scanline, upS: upS, downS: downS, leftS: leftS, rightS: rightS, rotate180cw: rotate180cw, addSteps: addSteps, sierpTriangle: sierpTriangle, triangleH: triangleH, triangleI: triangleI, squareH: squareH, squareI: squareI, closestGen: closestGen, hindex: hindex, sierpinski: sierpinski, isCompleteSched: isCompleteSched, removeDups: removeDups, orderJobs: orderJobs, orderJob: orderJob, noJobs: noJobs, append: append, contains: contains, remove: remove, drawScheduleWithIndex: drawScheduleWithIndex, drawSchedule: drawSchedule};
+                      return _elm.Schedule.values;
+                    };Elm.Util = Elm.Util || {};
+Elm.Util.make = function (_elm)
+                {
+                  "use strict";
+                  _elm.Util = _elm.Util || {};
+                  if (_elm.Util.values)
+                  return _elm.Util.values;
+                  var _N = Elm.Native,
+                      _U = _N.Utils.make(_elm),
+                      _L = _N.List.make(_elm),
+                      _E = _N.Error.make(_elm),
+                      $moduleName = "Util";
+                  var Basics = Elm.Basics.make(_elm);
+                  var Color = Elm.Color.make(_elm);
+                  var Dict = Elm.Dict.make(_elm);
+                  var Graphics = Graphics || {};
+                  Graphics.Collage = Elm.Graphics.Collage.make(_elm);
+                  var Graphics = Graphics || {};
+                  Graphics.Element = Elm.Graphics.Element.make(_elm);
+                  var List = Elm.List.make(_elm);
+                  var Maybe = Elm.Maybe.make(_elm);
+                  var Native = Native || {};
+                  Native.Json = Elm.Native.Json.make(_elm);
+                  var Native = Native || {};
+                  Native.Ports = Elm.Native.Ports.make(_elm);
+                  var Random = Elm.Random.make(_elm);
+                  var Set = Elm.Set.make(_elm);
+                  var Signal = Elm.Signal.make(_elm);
+                  var String = Elm.String.make(_elm);
+                  var Text = Elm.Text.make(_elm);
+                  var Time = Elm.Time.make(_elm);
+                  var Transform2D = Elm.Transform2D.make(_elm);
+                  var _op = {};
+                  var least = function (isLE)
+                              {
+                                return function ()
+                                       {
+                                         var min = F2(function (x,y)
+                                                      {
+                                                        return A2(isLE,x,y) ? x : y;
+                                                      });
+                                         return List.foldr(min);
+                                       }();
+                              };
+                  var greatest = function (cmp)
+                                 {
+                                   return least(F2(function (x,y)
+                                                   {
+                                                     return A2(cmp,y,x);
+                                                   }));
+                                 };
+                  var combinations = F2(function (lstA,lstB)
+                                        {
+                                          return function ()
+                                                 {
+                                                   switch (lstA.ctor)
+                                                   {case
+                                                    "::" :
+                                                      return _L.append(A2(List.map,
+                                                                          F2(function (v0,v1)
+                                                                             {
+                                                                               return {ctor: "_Tuple2", _0: v0, _1: v1};
+                                                                             })(lstA._0),
+                                                                          lstB),
+                                                                       A2(combinations,
+                                                                          lstA._1,
+                                                                          lstB));
+                                                    case
+                                                    "[]" :
+                                                      return _L.fromArray([]);}
+                                                   _E.Case($moduleName,"between lines 161 and 163");
+                                                 }();
+                                        });
+                  var repeatN = F2(function (n,elem)
+                                   {
+                                     return _U.cmp(n,0) > 0 ? {ctor: "::", _0: elem, _1: A2(repeatN,
+                                                                                            n - 1,
+                                                                                            elem)} : _L.fromArray([]);
+                                   });
+                  _op["!!"] = F2(function (lst,i)
+                                 {
+                                   return function ()
+                                          {
+                                            switch (lst.ctor)
+                                            {case
+                                             "::" :
+                                               return _U.cmp(i,0) < 1 ? lst._0 : A2(_op["!!"],
+                                                                                    lst._1,
+                                                                                    i - 1);}
+                                            _E.Case($moduleName,"between lines 152 and 153");
+                                          }();
+                                 });
+                  var applyUntil = F3(function (f,cond,init)
+                                      {
+                                        return cond(init) ? init : A3(applyUntil,f,cond,f(init));
+                                      });
+                  var iterateWhile = F3(function (f,cond,init)
+                                        {
+                                          return cond(init) ? {ctor: "::", _0: init, _1: A3(iterateWhile,
+                                                                                            f,
+                                                                                            cond,
+                                                                                            f(init))} : _L.fromArray([]);
+                                        });
+                  var applyN = F3(function (f,times,init)
+                                  {
+                                    return function ()
+                                           {
+                                             switch (times)
+                                             {case
+                                              0 :
+                                                return _L.fromArray([]);}
+                                             return {ctor: "::", _0: init, _1: A3(applyN,
+                                                                                  f,
+                                                                                  times - 1,
+                                                                                  f(init))};
+                                           }();
+                                  });
+                  var enumerate = function (lst)
+                                  {
+                                    return A2(List.zip,_L.range(0,List.length(lst) - 1),lst);
+                                  };
+                  var fromJust = function (_v7)
+                                 {
+                                   return function ()
+                                          {
+                                            switch (_v7.ctor)
+                                            {case
+                                             "Just" :
+                                               return _v7._0;}
+                                            _E.Case($moduleName,"on line 132, column 21 to 22");
+                                          }();
+                                 };
+                  var buffer = A2(Signal.foldp,
+                                  F2(function (x,y)
+                                     {
+                                       return {ctor: "::", _0: x, _1: y};
+                                     }),
+                                  _L.fromArray([]));
+                  var signalFromList = function (lst)
+                                       {
+                                         return function ($)
+                                                {
+                                                  return Signal.lift(List.head)(A2(Signal.dropIf,
+                                                                                   List.isEmpty,
+                                                                                   lst)(A2(Signal.foldp,
+                                                                                           function (_v10)
+                                                                                           {
+                                                                                             return function ()
+                                                                                                    {
+                                                                                                      return List.tail;
+                                                                                                    }();
+                                                                                           },
+                                                                                           {ctor: "::", _0: List.head(lst), _1: lst})($)));
+                                                };
+                                       };
+                  var iterateOn = function (f)
+                                  {
+                                    return Signal.foldp(F2(function (a,b)
+                                                           {
+                                                             return f(b);
+                                                           }));
+                                  };
+                  var dropAbsent = F2(function (init,s)
+                                      {
+                                        return A2(Signal._op["<~"],
+                                                  fromJust,
+                                                  A3(Signal.keepIf,
+                                                     Maybe.isJust,
+                                                     Maybe.Just(init),
+                                                     s));
+                                      });
+                  var toggleOnce = A2(Signal.foldp,
+                                      F2(function (_v12,a)
+                                         {
+                                           return function ()
+                                                  {
+                                                    return true;
+                                                  }();
+                                         }),
+                                      false);
+                  var toggle = A2(Signal.foldp,
+                                  F2(function (_v14,a)
+                                     {
+                                       return function ()
+                                              {
+                                                return Basics.not(a);
+                                              }();
+                                     }),
+                                  false);
+                  var modCount = function (m)
+                                 {
+                                   return function ()
+                                          {
+                                            var add = F2(function (_v16,a)
+                                                         {
+                                                           return function ()
+                                                                  {
+                                                                    return A2(Basics.mod,a + 1,m);
+                                                                  }();
+                                                         });
+                                            return A2(Signal.foldp,add,0);
+                                          }();
+                                 };
+                  var muc = F4(function ($switch,init,a,b)
+                               {
+                                 return function ()
+                                        {
+                                          var currentB = A3(Signal.dropWhen,
+                                                            A2(Signal.sampleOn,b,$switch),
+                                                            init,
+                                                            b);
+                                          var currentA = A3(Signal.keepWhen,
+                                                            A2(Signal.sampleOn,a,$switch),
+                                                            init,
+                                                            a);
+                                          return A2(Signal.merge,currentA,currentB);
+                                        }();
+                               });
+                  var dropN = F2(function (n,sig)
+                                 {
+                                   return function ()
+                                          {
+                                            var clock = A2(Signal.dropIf,
+                                                           function (x)
+                                                           {
+                                                             return _U.cmp(x,n) < 0;
+                                                           },
+                                                           0)(Signal.count(sig));
+                                            return A2(Signal.sampleOn,clock,sig);
+                                          }();
+                                 });
+                  var keepN = F2(function (n,sig)
+                                 {
+                                   return function ()
+                                          {
+                                            var clock = A2(Signal.keepIf,
+                                                           function (x)
+                                                           {
+                                                             return _U.cmp(x,n) < 0;
+                                                           },
+                                                           0)(Signal.count(sig));
+                                            return A2(Signal.sampleOn,clock,sig);
+                                          }();
+                                 });
+                  var zipDict = F2(function (dictA,dictB)
+                                   {
+                                     return function ()
+                                            {
+                                              var insertCombined = function (k)
+                                                                   {
+                                                                     return A2(Dict.insert,
+                                                                               k,
+                                                                               {ctor: "_Tuple2", _0: fromJust(A2(Dict.lookup,
+                                                                                                                 k,
+                                                                                                                 dictA)), _1: fromJust(A2(Dict.lookup,
+                                                                                                                                          k,
+                                                                                                                                          dictB))});
+                                                                   };
+                                              var allKeys = Set.toList(A2(Set.intersect,
+                                                                          Set.fromList(Dict.keys(dictA)),
+                                                                          Set.fromList(Dict.keys(dictB))));
+                                              return A3(List.foldl,
+                                                        insertCombined,
+                                                        Dict.empty,
+                                                        allKeys);
+                                            }();
+                                   });
+                  var loadingAnimation = function (isVisible)
+                                         {
+                                           return function ()
+                                                  {
+                                                    var emptyForm = Graphics.Collage.group(_L.fromArray([]));
+                                                    var emptyFormSig = Signal.sampleOn(isVisible)(Signal.constant(emptyForm));
+                                                    var clock = A3(Signal.keepWhen,
+                                                                   isVisible,
+                                                                   Time.millisecond,
+                                                                   Time.fps(30));
+                                                    var angle = A2(Signal._op["<~"],
+                                                                   function ($)
+                                                                   {
+                                                                     return Basics.degrees(function (a)
+                                                                                           {
+                                                                                             return a * 1.5;
+                                                                                           }(Basics.toFloat($)));
+                                                                   },
+                                                                   A2(modCount,360,clock));
+                                                    var transform = function (i)
+                                                                    {
+                                                                      return A2(Transform2D.multiply,
+                                                                                Transform2D.rotation(Basics.degrees(i * 60)),
+                                                                                A2(Transform2D.translation,
+                                                                                   0,
+                                                                                   7));
+                                                                    };
+                                                    var singleton = function (x)
+                                                                    {
+                                                                      return _L.fromArray([x]);
+                                                                    };
+                                                    var mkcircle = function (i)
+                                                                   {
+                                                                     return Graphics.Collage.groupTransform(transform(i))(singleton(A2(Graphics.Collage.outlined,
+                                                                                                                                       Graphics.Collage.solid(Color.black),
+                                                                                                                                       Graphics.Collage.circle(2))));
+                                                                   };
+                                                    var circles = A2(List.map,
+                                                                     mkcircle,
+                                                                     _L.range(0,5));
+                                                    var rotateLoader = function (a)
+                                                                       {
+                                                                         return A2(Graphics.Collage.groupTransform,
+                                                                                   Transform2D.rotation(0 - a),
+                                                                                   circles);
+                                                                       };
+                                                    return A4(muc,
+                                                              isVisible,
+                                                              emptyForm,
+                                                              A2(Signal._op["<~"],
+                                                                 rotateLoader,
+                                                                 angle),
+                                                              emptyFormSig);
+                                                  }();
+                                         };
+                  var rangeList = F3(function (from,to,len)
+                                     {
+                                       return function ()
+                                              {
+                                                var mapFloatToRange = function (x)
+                                                                      {
+                                                                        return Basics.floor(x * Basics.toFloat(to - from + 1)) + from;
+                                                                      };
+                                                return A2(Signal._op["<~"],
+                                                          List.map(mapFloatToRange),
+                                                          Random.floatList(len));
+                                              }();
+                                     });
+                  var swap = F3(function (keyX,keyY,dct)
+                                {
+                                  return function ()
+                                         {
+                                           var valY = fromJust(A2(Dict.lookup,keyY,dct));
+                                           var valX = fromJust(A2(Dict.lookup,keyX,dct));
+                                           return A2(Dict.insert,keyX,valY)(A3(Dict.insert,
+                                                                               keyY,
+                                                                               valX,
+                                                                               dct));
+                                         }();
+                                });
+                  var shuffle = function (cards)
+                                {
+                                  return function ()
+                                         {
+                                           var applySwaps = function (cdict)
+                                                            {
+                                                              return function ($)
+                                                                     {
+                                                                       return A2(List.foldl,
+                                                                                 F2(function (x,y)
+                                                                                    {
+                                                                                      return x(y);
+                                                                                    }),
+                                                                                 cdict)(List.map(Basics.uncurry(swap))($));
+                                                                     };
+                                                            };
+                                           var floatToRange = function (_v18)
+                                                              {
+                                                                return function ()
+                                                                       {
+                                                                         switch (_v18.ctor)
+                                                                         {case
+                                                                          "_Tuple2" :
+                                                                            return {ctor: "_Tuple2", _0: _v18._0, _1: Basics.floor(_v18._1 * Basics.toFloat(_v18._0 + 1))};}
+                                                                         _E.Case($moduleName,
+                                                                                 "on line 20, column 31 to 63");
+                                                                       }();
+                                                              };
+                                           var cardCnt = A2(Signal._op["<~"],List.length,cards);
+                                           var swapPairs = A2(Signal._op["<~"],
+                                                              function ($)
+                                                              {
+                                                                return List.reverse(List.map(floatToRange)(enumerate($)));
+                                                              },
+                                                              Random.floatList(cardCnt));
+                                           var cardsDict = A2(Signal._op["<~"],
+                                                              function ($)
+                                                              {
+                                                                return Dict.fromList(enumerate($));
+                                                              },
+                                                              cards);
+                                           return A2(Signal._op["<~"],
+                                                     Dict.values,
+                                                     A2(Signal._op["~"],
+                                                        A2(Signal._op["<~"],applySwaps,cardsDict),
+                                                        swapPairs));
+                                         }();
+                                };
+                  _elm.Util.values = {_op: _op, shuffle: shuffle, swap: swap, rangeList: rangeList, loadingAnimation: loadingAnimation, zipDict: zipDict, keepN: keepN, dropN: dropN, muc: muc, modCount: modCount, toggle: toggle, toggleOnce: toggleOnce, dropAbsent: dropAbsent, iterateOn: iterateOn, signalFromList: signalFromList, buffer: buffer, fromJust: fromJust, enumerate: enumerate, applyN: applyN, iterateWhile: iterateWhile, applyUntil: applyUntil, repeatN: repeatN, combinations: combinations, least: least, greatest: greatest};
+                  return _elm.Util.values;
+                };</script></head><body><script type="text/javascript">Elm.fullscreen(Elm.ScanlineCost)</script><noscript></noscript></body></html>

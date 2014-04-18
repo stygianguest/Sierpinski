@@ -1,0 +1,393 @@
+<html>
+<head>
+<script type="text/javascript" src="jquery.js"></script>
+<style type="text/css">
+    table {
+        border-collapse: separate;
+    }
+    td.job, td.cpu, td.mem {
+        height: 2em;
+        width: 2em;
+        text-align: center;
+        text-vertical-align: bottom;
+    }
+    td.job {
+        border: .2em solid black;
+        border-radius: 1em;
+        background-color: LightSlateGray;
+    }
+    td.cpu {
+        border: .2em solid black;
+    }
+    td.mem {
+        border: .2em solid black;
+        width: 3em;
+    }
+    td#disk {
+        border: .2em solid black;
+        width: 2em;
+    }
+    /*
+    .job {
+        background-color: LightBlue;
+        width: 1.6em;
+        height: 1.6em;
+        border-radius: .9em;
+        border: .1em solid black;
+        text-align: center;
+        line-height: 1.8em;
+    }
+    */
+</style>
+</head>
+  
+<table>
+    <tr>
+        <th>Schedule</th>
+        <th>CPUs</th>
+        <th>MEM</th>
+        <th>HD</th>
+    </tr>
+    <tr valign="top">
+        <td><table id="jobtable"></table></td>
+        <td><table id="cputable"></table></td>
+        <td><table id="memtable"></table></td>
+        <td>
+            <table>
+                <tr><td id="newLoads"></td></tr>
+                <tr><td id="totalLoads"></td></tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+    var noData = 4;
+    function mkJobId(x, y) {
+        return 'job' + x + 'x' + y;
+    }
+
+    var data = '';
+    // table rows + left headers
+    for (var i = 0; i < noData; i++) {
+        data += '<tr>';
+        data += '<th>' + i + '</th>';
+        for (var j = 0; j <= i; j++) {
+            var jobid = mkJobId(i,j);
+            data += '<td class="job" id="' + jobid + '"></td>';
+        }
+        data += '</tr>';
+    }
+    // bottom table headers
+    data += '<tr>';
+    data += '<th></th>';
+    for (var i = 0; i < noData; i++) {
+        data += '<th>' + i + '</th>';
+    }
+    data += '</tr>';
+    $("#jobtable").html(data);
+
+
+    //////////////////
+    // cpu table
+    var data = '';
+    var cpuNo = 0;
+    for (var i = 0; i < noData; i++) {
+        data += '<tr>';
+        for (var j = 0; j < noData; j++) {
+            var cpuid = "cpu" + cpuNo;
+            data += '<td class="cpu" id="' + cpuid + '"></td>';
+            cpuNo++;
+        }
+        data += '</tr>';
+    }
+    $("#cputable").html(data);
+
+    //////////////////
+    // mem table
+    var data = '';
+    for (var i = 0; i < noData; i++) {
+        var memid = "mem" + i;
+        data += '<tr><td class="mem" id="' + memid + '"></td></tr>';
+    }
+    $("#memtable").html(data);
+</script>
+
+<script type="text/javascript">
+    var schedule = new Array();
+    var jobTable = new Array();
+
+    function resetSchedule() {
+        schedule = new Array();
+        
+        jobTable = new Array(noData);
+        for (var i = 0; i <= noData; i++) {
+            jobTable[i] = new Array(i+1);
+            for (var j = 0; j <= i; j++) {
+                jobTable[i][j] = 0;
+            }
+        }
+    }
+
+    resetSchedule();
+
+    function updateScheduleTable() {
+        for (var i = 0; i < noData; i++) {
+            for (var j = 0; j <= i; j++) {
+                var jobid = mkJobId(i,j);
+                $("#"+jobid).html("");
+            }
+        }
+        for (var i = 0; i < schedule.length; i++) {
+            var jobid = mkJobId(schedule[i][0], schedule[i][1]);
+            $("#"+jobid).html(i+1);
+        }
+    }
+
+    function scheduleJob(x,y) {
+        // jobs (x,y) and (y,x) are equivalent
+        // swap to keep ordering uniform and ensure correct table formatting
+        if (y > x) {
+            var tmp = x;
+            x = y;
+            y = tmp;
+        }
+
+        // if job was already scheduled, remove it first
+        if (jobTable[x][y] > 0)
+            schedule.splice(jobTable[x][y] - 1,1);
+
+        jobTable[x][y] = schedule.length + 1;
+        schedule.push([x,y]);
+    }
+
+    // set click handlers for jobs in schedule table
+    for (var i = 0; i < noData; i++) {
+        for (var j = 0; j <= i; j++) {
+            var jobid = mkJobId(i,j);
+
+            //FIXME: replace this by generating tr with onClick
+            // call just to get the current values of i and j in closure
+            (function(x,y) {
+                $("#" + jobid).click(function() {
+                    scheduleJob(x,y);
+                    updateScheduleTable();
+                });
+            })(i,j);
+        }
+    }
+</script>
+
+<script type="text/javascript" src="VM.js"> </script>
+<script type="text/javascript">
+    var currentJob = 0;
+
+    function machineStep() {
+        //FIXME: while loops have high risk of looping indefinately, prevent it?
+
+        if (currentJob < schedule.length) {
+            job = schedule[currentJob]
+
+            // load data
+            while (!loadData(job[0],job[1]))
+                stopLastJob(); // if not enough memory is available, finish jobs
+
+            // start the job
+            while (!startJob(job[0],job[1]))
+                stopLastJob(); // if no processor is available, finish job
+
+            currentJob++;
+
+        } else {
+            // end of schedule: unload remaining jobs
+            while (stopLastJob()) {}
+            $("#newLoads").html("");
+        }
+
+        //FIXME: separate model from view for CPUs?
+        updateMem();
+    }
+</script>
+
+<button id="step" type="button" onClick="javascript:machineStep()">step</button>
+
+<script type="text/javascript">
+    function splitTriangle(xs, ys, xe, ye, isLeft) {
+        // point between start and end
+        var xc = (xs+xe)/2;
+        var yc = (ys+ye)/2;
+
+        // schedule and stop deviding the triangle 
+        // if surface of this triangle is <= 1/2
+        // FIXME: could we stop earlier?
+        if (!isLeft && (xe-xs)*(xe-xs) + (ye-ys)*(ye-ys) <= 2) {
+            scheduleJob(Math.round(xc-.5),Math.round(yc-.5));
+            return;
+        }
+
+        var xm = xc;
+        var ym = yc;
+
+        if (isLeft) {
+            xm += ye - yc;
+            ym -= xe - xc
+        } else {
+            xm -= ye - yc;
+            ym += xe - xc;
+        }
+
+        splitTriangle(xs,ys,xm,ym,!isLeft);
+        splitTriangle(xm,ym,xe,ye,!isLeft);
+    }
+
+    function sierpinski() {
+        resetSchedule();
+        splitTriangle(0, 0, noData, noData, false);
+        updateScheduleTable();
+    }
+
+    function naiveLeftRight() {
+        resetSchedule();
+        for (var i = 0; i < noData; i++) {
+            for (var j = 0; j <= i; j++) {
+                scheduleJob(i,j);
+            }
+        }
+        updateScheduleTable();
+    }
+
+    function naiveUpDown() {
+        resetSchedule();
+        for (var i = 0; i < noData; i++) {
+            for (var j = i; j < noData; j++) {
+                scheduleJob(i,j);
+            }
+        }
+        updateScheduleTable();
+    }
+
+    function reset() {
+        resetSchedule();
+        updateScheduleTable();
+    }
+</script>
+
+<button type="button" onClick="javascript:sierpinski()">sierpinski</button>
+<button type="button" onClick="javascript:naiveLeftRight()">left-right</button>
+<button type="button" onClick="javascript:naiveUpDown()">up-down</button>
+<button type="button" onClick="javascript:reset()">reset</button>
+
+
+<div>
+<canvas id="pathCanvas" width="256", height="256">Schedule Path</canvas>
+<canvas id="workingSetCanvas" width="256", height="256">Working Set Graph</canvas>
+<canvas id="loadCountCanvas" width="256", height="256">Load Count Graph</canvas>
+</div>
+
+<script type="text/javascript">
+    //TODO: draw a grid, mark forgotten jobs
+    function drawSchedule(noStations, schedule) {
+        var canvas = document.getElementById("pathCanvas");
+        var context = canvas.getContext("2d");
+
+        var xscale = canvas.width / noStations;
+        var yscale = canvas.height / noStations;
+
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.beginPath();
+
+        for (var i = 0; i < schedule.length-1; i++) {
+            context.moveTo(xscale * schedule[i][1], yscale * schedule[i][0]);
+            context.lineTo(xscale * schedule[i+1][1], yscale * schedule[i+1][0]);
+            context.stroke();
+        }
+    }
+
+    function drawWorkingSetCounts(noStations, wsc) {
+        var canvas = document.getElementById("workingSetCanvas");
+        var context = canvas.getContext("2d");
+
+        var xscale = canvas.width / wsc.length;
+        var yscale = canvas.height / noStations;
+
+        context.lineWidth = 0; // no lines around rectangles
+
+        for (var x = 0; x < wsc.length; x++) {
+            // assert wsc[x].length == noStations
+            for (var y = 0; y < wsc[x].length; y++) {
+                // scale alpha to correspond to distribution
+                var a = wsc[x][y] / (wsc.length - x);
+                context.fillStyle = "rgba(0, 0, 255," + a + ")";
+                // '#00f'; // blue
+                context.fillRect(xscale*x, canvas.height-yscale*(y+1),
+                    xscale, yscale);
+            }
+        }
+
+    }
+
+    function workingSetAnalysis(noStations, schedule) {
+        // new empty workingset count table
+        var wsSizes = new Array(schedule.length);
+        for (var i = 0; i < schedule.length; i++) {
+           wsSizes[i] = new Array(noStations);
+            for (var j = 0; j < noStations; j++) {
+                wsSizes[i][j] = 0;
+            }
+        }
+
+        // merge requires schedule to have sorted jobs, 
+        // i.e., i<=j for all jobs (i,j)
+        var ws = schedule;
+        var windowSize = 0;
+        while (ws.length > 1) {
+            // increase counts
+            for (var i = 0; i < ws.length; i++) {
+                // assert ws[i].length <= noStations
+                wsSizes[windowSize][ws[i].length-1]++;
+            }
+
+            // create working sets for windowSize+1
+            var nws = new Array(ws.length-1);
+            for (var i = 1; i < ws.length; i++) {
+                nws[i-1] = mergeWorkingSets(ws[i-1], ws[i]);
+            }
+            ws = nws;
+            windowSize++;
+        }
+
+        return wsSizes;
+    }
+
+    function mergeWorkingSets(as, bs) {
+        // sets as en bs must be reversely ordered arrays
+        var merged = new Array();
+
+        var i = 0;
+        var j = 0;
+        while (i < as.length && j < bs.length) {
+            if (as[i] > bs[j]) {
+                merged.push(as[i++]);
+            } else if (as[i] < bs[j]) {
+                merged.push(bs[j++]);
+            } else { // as[i] == bs[j]
+                merged.push(as[i++]);
+                j++
+            }
+        }
+
+        return merged;
+    }
+
+    function analyze() {
+        drawSchedule(noData, schedule);
+        drawWorkingSetCounts(noData, workingSetAnalysis(noData, schedule));
+    }
+</script>
+
+<button type="button" onClick="javascript:analyze()">analyze</button>
+
+</body>
+
+</html>

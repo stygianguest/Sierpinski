@@ -1,0 +1,546 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="UTF-8"><title>SierpinskyCurve</title><script type="text/javascript" src="/home/gideon/.cabal/share/Elm-0.12/elm-runtime.js"></script><script type="text/javascript">Elm.SierpinskyCurve = Elm.SierpinskyCurve || {};
+Elm.SierpinskyCurve.make = function (_elm)
+                           {
+                             "use strict";
+                             _elm.SierpinskyCurve = _elm.SierpinskyCurve || {};
+                             if (_elm.SierpinskyCurve.values)
+                             return _elm.SierpinskyCurve.values;
+                             var _N = Elm.Native,
+                                 _U = _N.Utils.make(_elm),
+                                 _L = _N.List.make(_elm),
+                                 _E = _N.Error.make(_elm),
+                                 $moduleName = "SierpinskyCurve";
+                             var Basics = Elm.Basics.make(_elm);
+                             var Color = Elm.Color.make(_elm);
+                             var Graphics = Graphics || {};
+                             Graphics.Collage = Elm.Graphics.Collage.make(_elm);
+                             var Graphics = Graphics || {};
+                             Graphics.Element = Elm.Graphics.Element.make(_elm);
+                             var List = Elm.List.make(_elm);
+                             var Maybe = Elm.Maybe.make(_elm);
+                             var Native = Native || {};
+                             Native.Json = Elm.Native.Json.make(_elm);
+                             var Native = Native || {};
+                             Native.Ports = Elm.Native.Ports.make(_elm);
+                             var Signal = Elm.Signal.make(_elm);
+                             var String = Elm.String.make(_elm);
+                             var Text = Elm.Text.make(_elm);
+                             var Time = Elm.Time.make(_elm);
+                             var Util = Elm.Util.make(_elm);
+                             var _op = {};
+                             var rotateVec = F2(function (a,_v0)
+                                                {
+                                                  return function ()
+                                                         {
+                                                           switch (_v0.ctor)
+                                                           {case
+                                                            "_Tuple2" :
+                                                              return function ()
+                                                                     {
+                                                                       var sina = Basics.sin(a);
+                                                                       var cosa = Basics.cos(a);
+                                                                       return {ctor: "_Tuple2", _0: _v0._0 * cosa - _v0._1 * sina, _1: _v0._0 * sina + _v0._1 * cosa};
+                                                                     }();}
+                                                           _E.Case($moduleName,
+                                                                   "between lines 49 and 51");
+                                                         }();
+                                                });
+                             var addVec = F2(function (_v4,_v5)
+                                             {
+                                               return function ()
+                                                      {
+                                                        switch (_v5.ctor)
+                                                        {case
+                                                         "_Tuple2" :
+                                                           return function ()
+                                                                  {
+                                                                    switch (_v4.ctor)
+                                                                    {case
+                                                                     "_Tuple2" :
+                                                                       return {ctor: "_Tuple2", _0: _v4._0 + _v5._0, _1: _v4._1 + _v5._1};}
+                                                                    _E.Case($moduleName,
+                                                                            "on line 45, column 23 to 31");
+                                                                  }();}
+                                                        _E.Case($moduleName,
+                                                                "on line 45, column 23 to 31");
+                                                      }();
+                                             });
+                             var mulVec = F2(function (x,_v12)
+                                             {
+                                               return function ()
+                                                      {
+                                                        switch (_v12.ctor)
+                                                        {case
+                                                         "_Tuple2" :
+                                                           return {ctor: "_Tuple2", _0: _v12._0 * x, _1: _v12._1 * x};}
+                                                        _E.Case($moduleName,
+                                                                "on line 42, column 19 to 27");
+                                                      }();
+                                             });
+                             var sierpinskyCurve = function (n)
+                                                   {
+                                                     return _U.cmp(n,
+                                                                   0) < 1 ? _L.fromArray([{ctor: "_Tuple2", _0: -0.4, _1: -0.4}]) : function ()
+                                                                                                                                    {
+                                                                                                                                      var southTrans = function ($)
+                                                                                                                                                       {
+                                                                                                                                                         return addVec({ctor: "_Tuple2", _0: 0, _1: -1})(rotateVec(Basics.degrees(-135))(mulVec(0.7)($)));
+                                                                                                                                                       };
+                                                                                                                                      var westTrans = function ($)
+                                                                                                                                                      {
+                                                                                                                                                        return addVec({ctor: "_Tuple2", _0: -1, _1: 0})(rotateVec(Basics.degrees(135))(mulVec(0.7)($)));
+                                                                                                                                                      };
+                                                                                                                                      var rec = sierpinskyCurve(n - 1);
+                                                                                                                                      return _L.append(List.reverse(A2(List.map,
+                                                                                                                                                                       southTrans,
+                                                                                                                                                                       rec)),
+                                                                                                                                                       List.reverse(A2(List.map,
+                                                                                                                                                                       westTrans,
+                                                                                                                                                                       rec)));
+                                                                                                                                    }();
+                                                   };
+                             var sierpinskyCurveForm = function ()
+                                                       {
+                                                         var pathStyle = _U.replace([["width",
+                                                                                      5.0e-2],
+                                                                                     ["join",
+                                                                                      Graphics.Collage.Smooth],
+                                                                                     ["cap",
+                                                                                      Graphics.Collage.Round]],
+                                                                                    Graphics.Collage.defaultLine);
+                                                         return function ($)
+                                                                {
+                                                                  return Graphics.Collage.traced(pathStyle)(Graphics.Collage.path(sierpinskyCurve($)));
+                                                                };
+                                                       }();
+                             var sierpinskyTriangle = function (n)
+                                                      {
+                                                        return _U.cmp(n,
+                                                                      0) < 1 ? Graphics.Collage.alpha(0.7)(Graphics.Collage.filled(Color.blue)(Graphics.Collage.polygon(_L.fromArray([{ctor: "_Tuple2", _0: -1, _1: -1},
+                                                                                                                                                                                      {ctor: "_Tuple2", _0: 1, _1: -1},
+                                                                                                                                                                                      {ctor: "_Tuple2", _0: -1, _1: 1}])))) : function ()
+                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                var rec = sierpinskyTriangle(n - 1);
+                                                                                                                                                                                                                                return Graphics.Collage.group(_L.fromArray([Graphics.Collage.scale(0.7)(Graphics.Collage.moveX(-1)(Graphics.Collage.rotate(Basics.degrees(135))(rec))),
+                                                                                                                                                                                                                                                                            Graphics.Collage.scale(0.7)(Graphics.Collage.moveY(-1)(Graphics.Collage.rotate(Basics.degrees(-135))(rec)))]));
+                                                                                                                                                                                                                              }();
+                                                      };
+                             var main = function ()
+                                        {
+                                          var s = 300;
+                                          var plot = function (n)
+                                                     {
+                                                       return A3(Graphics.Collage.collage,
+                                                                 s,
+                                                                 s,
+                                                                 _L.fromArray([Graphics.Collage.scale(s / 2)(sierpinskyTriangle(n)),
+                                                                               Graphics.Collage.scale(s / 2)(sierpinskyCurveForm(n)),
+                                                                               Graphics.Collage.scale(4)(Graphics.Collage.move({ctor: "_Tuple2", _0: s / 4, _1: s / 4})(Graphics.Collage.toForm(Text.plainText(String.show(n)))))]));
+                                                     };
+                                          return A2(Signal._op["<~"],
+                                                    plot,
+                                                    A2(Util.modCount,
+                                                       7,
+                                                       Time.every(2 * Time.second)));
+                                        }();
+                             _elm.SierpinskyCurve.values = {_op: _op, main: main, sierpinskyTriangle: sierpinskyTriangle, sierpinskyCurveForm: sierpinskyCurveForm, sierpinskyCurve: sierpinskyCurve, mulVec: mulVec, addVec: addVec, rotateVec: rotateVec};
+                             return _elm.SierpinskyCurve.values;
+                           };Elm.Util = Elm.Util || {};
+Elm.Util.make = function (_elm)
+                {
+                  "use strict";
+                  _elm.Util = _elm.Util || {};
+                  if (_elm.Util.values)
+                  return _elm.Util.values;
+                  var _N = Elm.Native,
+                      _U = _N.Utils.make(_elm),
+                      _L = _N.List.make(_elm),
+                      _E = _N.Error.make(_elm),
+                      $moduleName = "Util";
+                  var Basics = Elm.Basics.make(_elm);
+                  var Color = Elm.Color.make(_elm);
+                  var Dict = Elm.Dict.make(_elm);
+                  var Graphics = Graphics || {};
+                  Graphics.Collage = Elm.Graphics.Collage.make(_elm);
+                  var Graphics = Graphics || {};
+                  Graphics.Element = Elm.Graphics.Element.make(_elm);
+                  var List = Elm.List.make(_elm);
+                  var Maybe = Elm.Maybe.make(_elm);
+                  var Native = Native || {};
+                  Native.Json = Elm.Native.Json.make(_elm);
+                  var Native = Native || {};
+                  Native.Ports = Elm.Native.Ports.make(_elm);
+                  var Random = Elm.Random.make(_elm);
+                  var Set = Elm.Set.make(_elm);
+                  var Signal = Elm.Signal.make(_elm);
+                  var String = Elm.String.make(_elm);
+                  var Text = Elm.Text.make(_elm);
+                  var Time = Elm.Time.make(_elm);
+                  var Transform2D = Elm.Transform2D.make(_elm);
+                  var _op = {};
+                  var least = function (isLE)
+                              {
+                                return function ()
+                                       {
+                                         var min = F2(function (x,y)
+                                                      {
+                                                        return A2(isLE,x,y) ? x : y;
+                                                      });
+                                         return List.foldr(min);
+                                       }();
+                              };
+                  var greatest = function (cmp)
+                                 {
+                                   return least(F2(function (x,y)
+                                                   {
+                                                     return A2(cmp,y,x);
+                                                   }));
+                                 };
+                  var combinations = F2(function (lstA,lstB)
+                                        {
+                                          return function ()
+                                                 {
+                                                   switch (lstA.ctor)
+                                                   {case
+                                                    "::" :
+                                                      return _L.append(A2(List.map,
+                                                                          F2(function (v0,v1)
+                                                                             {
+                                                                               return {ctor: "_Tuple2", _0: v0, _1: v1};
+                                                                             })(lstA._0),
+                                                                          lstB),
+                                                                       A2(combinations,
+                                                                          lstA._1,
+                                                                          lstB));
+                                                    case
+                                                    "[]" :
+                                                      return _L.fromArray([]);}
+                                                   _E.Case($moduleName,"between lines 161 and 163");
+                                                 }();
+                                        });
+                  var repeatN = F2(function (n,elem)
+                                   {
+                                     return _U.cmp(n,0) > 0 ? {ctor: "::", _0: elem, _1: A2(repeatN,
+                                                                                            n - 1,
+                                                                                            elem)} : _L.fromArray([]);
+                                   });
+                  _op["!!"] = F2(function (lst,i)
+                                 {
+                                   return function ()
+                                          {
+                                            switch (lst.ctor)
+                                            {case
+                                             "::" :
+                                               return _U.cmp(i,0) < 1 ? lst._0 : A2(_op["!!"],
+                                                                                    lst._1,
+                                                                                    i - 1);}
+                                            _E.Case($moduleName,"between lines 152 and 153");
+                                          }();
+                                 });
+                  var applyUntil = F3(function (f,cond,init)
+                                      {
+                                        return cond(init) ? init : A3(applyUntil,f,cond,f(init));
+                                      });
+                  var iterateWhile = F3(function (f,cond,init)
+                                        {
+                                          return cond(init) ? {ctor: "::", _0: init, _1: A3(iterateWhile,
+                                                                                            f,
+                                                                                            cond,
+                                                                                            f(init))} : _L.fromArray([]);
+                                        });
+                  var applyN = F3(function (f,times,init)
+                                  {
+                                    return function ()
+                                           {
+                                             switch (times)
+                                             {case
+                                              0 :
+                                                return _L.fromArray([]);}
+                                             return {ctor: "::", _0: init, _1: A3(applyN,
+                                                                                  f,
+                                                                                  times - 1,
+                                                                                  f(init))};
+                                           }();
+                                  });
+                  var enumerate = function (lst)
+                                  {
+                                    return A2(List.zip,_L.range(0,List.length(lst) - 1),lst);
+                                  };
+                  var fromJust = function (_v7)
+                                 {
+                                   return function ()
+                                          {
+                                            switch (_v7.ctor)
+                                            {case
+                                             "Just" :
+                                               return _v7._0;}
+                                            _E.Case($moduleName,"on line 132, column 21 to 22");
+                                          }();
+                                 };
+                  var buffer = A2(Signal.foldp,
+                                  F2(function (x,y)
+                                     {
+                                       return {ctor: "::", _0: x, _1: y};
+                                     }),
+                                  _L.fromArray([]));
+                  var signalFromList = function (lst)
+                                       {
+                                         return function ($)
+                                                {
+                                                  return Signal.lift(List.head)(A2(Signal.dropIf,
+                                                                                   List.isEmpty,
+                                                                                   lst)(A2(Signal.foldp,
+                                                                                           function (_v10)
+                                                                                           {
+                                                                                             return function ()
+                                                                                                    {
+                                                                                                      return List.tail;
+                                                                                                    }();
+                                                                                           },
+                                                                                           {ctor: "::", _0: List.head(lst), _1: lst})($)));
+                                                };
+                                       };
+                  var iterateOn = function (f)
+                                  {
+                                    return Signal.foldp(F2(function (a,b)
+                                                           {
+                                                             return f(b);
+                                                           }));
+                                  };
+                  var dropAbsent = F2(function (init,s)
+                                      {
+                                        return A2(Signal._op["<~"],
+                                                  fromJust,
+                                                  A3(Signal.keepIf,
+                                                     Maybe.isJust,
+                                                     Maybe.Just(init),
+                                                     s));
+                                      });
+                  var toggleOnce = A2(Signal.foldp,
+                                      F2(function (_v12,a)
+                                         {
+                                           return function ()
+                                                  {
+                                                    return true;
+                                                  }();
+                                         }),
+                                      false);
+                  var toggle = A2(Signal.foldp,
+                                  F2(function (_v14,a)
+                                     {
+                                       return function ()
+                                              {
+                                                return Basics.not(a);
+                                              }();
+                                     }),
+                                  false);
+                  var modCount = function (m)
+                                 {
+                                   return function ()
+                                          {
+                                            var add = F2(function (_v16,a)
+                                                         {
+                                                           return function ()
+                                                                  {
+                                                                    return A2(Basics.mod,a + 1,m);
+                                                                  }();
+                                                         });
+                                            return A2(Signal.foldp,add,0);
+                                          }();
+                                 };
+                  var muc = F4(function ($switch,init,a,b)
+                               {
+                                 return function ()
+                                        {
+                                          var currentB = A3(Signal.dropWhen,
+                                                            A2(Signal.sampleOn,b,$switch),
+                                                            init,
+                                                            b);
+                                          var currentA = A3(Signal.keepWhen,
+                                                            A2(Signal.sampleOn,a,$switch),
+                                                            init,
+                                                            a);
+                                          return A2(Signal.merge,currentA,currentB);
+                                        }();
+                               });
+                  var dropN = F2(function (n,sig)
+                                 {
+                                   return function ()
+                                          {
+                                            var clock = A2(Signal.dropIf,
+                                                           function (x)
+                                                           {
+                                                             return _U.cmp(x,n) < 0;
+                                                           },
+                                                           0)(Signal.count(sig));
+                                            return A2(Signal.sampleOn,clock,sig);
+                                          }();
+                                 });
+                  var keepN = F2(function (n,sig)
+                                 {
+                                   return function ()
+                                          {
+                                            var clock = A2(Signal.keepIf,
+                                                           function (x)
+                                                           {
+                                                             return _U.cmp(x,n) < 0;
+                                                           },
+                                                           0)(Signal.count(sig));
+                                            return A2(Signal.sampleOn,clock,sig);
+                                          }();
+                                 });
+                  var zipDict = F2(function (dictA,dictB)
+                                   {
+                                     return function ()
+                                            {
+                                              var insertCombined = function (k)
+                                                                   {
+                                                                     return A2(Dict.insert,
+                                                                               k,
+                                                                               {ctor: "_Tuple2", _0: fromJust(A2(Dict.lookup,
+                                                                                                                 k,
+                                                                                                                 dictA)), _1: fromJust(A2(Dict.lookup,
+                                                                                                                                          k,
+                                                                                                                                          dictB))});
+                                                                   };
+                                              var allKeys = Set.toList(A2(Set.intersect,
+                                                                          Set.fromList(Dict.keys(dictA)),
+                                                                          Set.fromList(Dict.keys(dictB))));
+                                              return A3(List.foldl,
+                                                        insertCombined,
+                                                        Dict.empty,
+                                                        allKeys);
+                                            }();
+                                   });
+                  var loadingAnimation = function (isVisible)
+                                         {
+                                           return function ()
+                                                  {
+                                                    var emptyForm = Graphics.Collage.group(_L.fromArray([]));
+                                                    var emptyFormSig = Signal.sampleOn(isVisible)(Signal.constant(emptyForm));
+                                                    var clock = A3(Signal.keepWhen,
+                                                                   isVisible,
+                                                                   Time.millisecond,
+                                                                   Time.fps(30));
+                                                    var angle = A2(Signal._op["<~"],
+                                                                   function ($)
+                                                                   {
+                                                                     return Basics.degrees(function (a)
+                                                                                           {
+                                                                                             return a * 1.5;
+                                                                                           }(Basics.toFloat($)));
+                                                                   },
+                                                                   A2(modCount,360,clock));
+                                                    var transform = function (i)
+                                                                    {
+                                                                      return A2(Transform2D.multiply,
+                                                                                Transform2D.rotation(Basics.degrees(i * 60)),
+                                                                                A2(Transform2D.translation,
+                                                                                   0,
+                                                                                   7));
+                                                                    };
+                                                    var singleton = function (x)
+                                                                    {
+                                                                      return _L.fromArray([x]);
+                                                                    };
+                                                    var mkcircle = function (i)
+                                                                   {
+                                                                     return Graphics.Collage.groupTransform(transform(i))(singleton(A2(Graphics.Collage.outlined,
+                                                                                                                                       Graphics.Collage.solid(Color.black),
+                                                                                                                                       Graphics.Collage.circle(2))));
+                                                                   };
+                                                    var circles = A2(List.map,
+                                                                     mkcircle,
+                                                                     _L.range(0,5));
+                                                    var rotateLoader = function (a)
+                                                                       {
+                                                                         return A2(Graphics.Collage.groupTransform,
+                                                                                   Transform2D.rotation(0 - a),
+                                                                                   circles);
+                                                                       };
+                                                    return A4(muc,
+                                                              isVisible,
+                                                              emptyForm,
+                                                              A2(Signal._op["<~"],
+                                                                 rotateLoader,
+                                                                 angle),
+                                                              emptyFormSig);
+                                                  }();
+                                         };
+                  var rangeList = F3(function (from,to,len)
+                                     {
+                                       return function ()
+                                              {
+                                                var mapFloatToRange = function (x)
+                                                                      {
+                                                                        return Basics.floor(x * Basics.toFloat(to - from + 1)) + from;
+                                                                      };
+                                                return A2(Signal._op["<~"],
+                                                          List.map(mapFloatToRange),
+                                                          Random.floatList(len));
+                                              }();
+                                     });
+                  var swap = F3(function (keyX,keyY,dct)
+                                {
+                                  return function ()
+                                         {
+                                           var valY = fromJust(A2(Dict.lookup,keyY,dct));
+                                           var valX = fromJust(A2(Dict.lookup,keyX,dct));
+                                           return A2(Dict.insert,keyX,valY)(A3(Dict.insert,
+                                                                               keyY,
+                                                                               valX,
+                                                                               dct));
+                                         }();
+                                });
+                  var shuffle = function (cards)
+                                {
+                                  return function ()
+                                         {
+                                           var applySwaps = function (cdict)
+                                                            {
+                                                              return function ($)
+                                                                     {
+                                                                       return A2(List.foldl,
+                                                                                 F2(function (x,y)
+                                                                                    {
+                                                                                      return x(y);
+                                                                                    }),
+                                                                                 cdict)(List.map(Basics.uncurry(swap))($));
+                                                                     };
+                                                            };
+                                           var floatToRange = function (_v18)
+                                                              {
+                                                                return function ()
+                                                                       {
+                                                                         switch (_v18.ctor)
+                                                                         {case
+                                                                          "_Tuple2" :
+                                                                            return {ctor: "_Tuple2", _0: _v18._0, _1: Basics.floor(_v18._1 * Basics.toFloat(_v18._0 + 1))};}
+                                                                         _E.Case($moduleName,
+                                                                                 "on line 20, column 31 to 63");
+                                                                       }();
+                                                              };
+                                           var cardCnt = A2(Signal._op["<~"],List.length,cards);
+                                           var swapPairs = A2(Signal._op["<~"],
+                                                              function ($)
+                                                              {
+                                                                return List.reverse(List.map(floatToRange)(enumerate($)));
+                                                              },
+                                                              Random.floatList(cardCnt));
+                                           var cardsDict = A2(Signal._op["<~"],
+                                                              function ($)
+                                                              {
+                                                                return Dict.fromList(enumerate($));
+                                                              },
+                                                              cards);
+                                           return A2(Signal._op["<~"],
+                                                     Dict.values,
+                                                     A2(Signal._op["~"],
+                                                        A2(Signal._op["<~"],applySwaps,cardsDict),
+                                                        swapPairs));
+                                         }();
+                                };
+                  _elm.Util.values = {_op: _op, shuffle: shuffle, swap: swap, rangeList: rangeList, loadingAnimation: loadingAnimation, zipDict: zipDict, keepN: keepN, dropN: dropN, muc: muc, modCount: modCount, toggle: toggle, toggleOnce: toggleOnce, dropAbsent: dropAbsent, iterateOn: iterateOn, signalFromList: signalFromList, buffer: buffer, fromJust: fromJust, enumerate: enumerate, applyN: applyN, iterateWhile: iterateWhile, applyUntil: applyUntil, repeatN: repeatN, combinations: combinations, least: least, greatest: greatest};
+                  return _elm.Util.values;
+                };</script></head><body><script type="text/javascript">Elm.fullscreen(Elm.SierpinskyCurve)</script><noscript></noscript></body></html>
