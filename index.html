@@ -46,7 +46,7 @@ Only the lower (or upper) triangle of the matrix need to be visited as we consid
 The pseudo-code above consists in the following schedule that we call the scanline schedule.
 </p>
 
-<center><iframe src="ScanlineSchedule.html" width=400 height=400 frameborder=0></iframe></center>
+<center><a name="ScanlineSchedule"><iframe src="ScanlineSchedule.html" width=400 height=400 frameborder=0></iframe></a></center>
 
 <p>
 The displayed schedule thus starts correlating station 1 with itself, then correlates 1 with 2, 2 with 2, etc.
@@ -54,7 +54,7 @@ The cost - in terms of the number of disk accesses or cache misses - of this sch
 Running such a simulation with memory capacity for five elements gives the following cumulative cost for the successive executions.
 </p>
 
-<center><iframe src="ScanlineCost.html" width=600 height=400 frameborder=0></iframe></center>
+<center><a name="ScanlineCost"><iframe src="ScanlineCost.html" width=600 height=400 frameborder=0></iframe></a></center>
 
 <p>
 The cumulative cost shows that the scanline schedule initially (up to 15) performs quite well, but once the horizontal stretches of the schedule are longer than 5 each new job results in a cache miss.
@@ -62,7 +62,7 @@ In fact, one can do quite a bit better by making shorter stretches.
 Give it a try!
 </p>
 
-<center><iframe src="ScheduleGame.html" width=600 height=400 frameborder=0></iframe></center>
+<center><a name="ScheduleGame"><iframe src="ScheduleGame.html" width=600 height=400 frameborder=0></iframe></a></center>
 
 <p>
 The above little applet allows you to create a schedule by clicking on the jobs and computes the total number of disk accesses at the time of each successive job in the schedule.
@@ -88,7 +88,7 @@ Applying this pattern recursively, we get the following sequence.
 </p>
 
 
-<center><iframe src="SierpinskyCurve.html" width=300 height=300 frameborder=0></iframe></center>
+<center><a name="SierpinskyCurve"><iframe src="SierpinskyCurve.html" width=300 height=300 frameborder=0></iframe></a></center>
 
 <p>
 The schedule based on the Sierpinsky curve doesn't look quite the same because we cannot properly subdivide the triangle that consists of discrete jobs.
@@ -96,37 +96,37 @@ In stead, we use a variant that is called the H-index.
 In this context "index" is another word for schedule and the H stands for the shape the pattern takes: there's an H on its side in the lower right corner.
 </p>
 
-<center><iframe src="HIndex.html" width=400 height=400 frameborder=0></iframe></center>
+<center><a name="HIndex"><iframe src="HIndex.html" width=400 height=400 frameborder=0></iframe></a></center>
 
 <p>
 How much better does the H-index do?
 The following graph plots the cost in termes of cache misses of each schedule for a case with 64 stations and therefore 576 jobs for varying amounts of memory.
 </p>
 
-<center><iframe src="PerformancePlot.html" width=600 height=400 frameborder=0></iframe></center>
+<center><a name="PerformancePlot"><iframe src="PerformancePlot.html" width=600 height=400 frameborder=0></iframe></a></center>
 
 <p>
-Note that if memory has capacity for 64 stations all schedules will have the same cost because every job has to be loaded exactly once.
+The range is limited from 2 to 64: one needs to be able to store at least two and if memory has capacity for 64 stations all schedules will have cost 64 because every job has to be loaded exactly once.
+The cost of the scanline algorithm is dominated by a linear relation also seen in the last part (after job 16) in the <a href="#ScanlineCost">previous job</a>.
+One may also note that the H-index performs best when the memory capacity is a power of two, note in particular the low points at 4, 8 and 16.
+In between those spots the H-index becomes slightly irregular but generally the plotted curve shows a logarithmic 
 <p>
 
 
 <h2>Conclusion</h2>
 
-optimality
-
-boundary conditions (not powers of two)
+Hopefully the <a href="#PerformancePlot">final plot</a> convinces you that the Sierpinski curve, or more accurately, H-index performs much better than the scanline schedule.
+However, I have not proven that the H-index is the optimal schedule.
+In fact, one can easily show that for certain memory sizes, such as in the <a href="#ScheduleGame">manual scheduling exercise</a>, it is possible to do (slightly) better than the H-index.
+<a href="http://www.sciencedirect.com/science/article/pii/S0166218X00003267">Rolf Niedermeiera, Klaus Reinhardt and Peter Sanders</a>, who invented the H-index, have given strong evidence that it is asymptotically optimal.
 
 
 <h2>Post Scriptum</h2>
 
-other indexing schemes (locality)
+An attentive reader may have noticed that I've only used examples where the number of stations is a power of two.
+This is no coincidence: the H-index is really only defined for those sizes.
+One can, however, adapt the index for larger sizes in ways that most of the schedule will be according to the h-index.
+Exploring the different solutions would be an interesting project.
 
-particularity of stations: both dimensions of the matrix are the same stations: doesn't matter asymptotically as log as memory is considerably smaller than the number of stations
-
-<p>
-This leads us to the realm of <a href="http://en.wikipedia.org/wiki/Cache-oblivious_algorithm">cache oblivious algorithms</a> that perform well, without any knowledge of the memory's capacity.
-</p>
-
-other caching strategies
 </body>
 </html>
