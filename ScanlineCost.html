@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html><head><meta charset="UTF-8"><title>ScanlineCost</title><script type="text/javascript" src="elm-runtime.js"></script><script type="text/javascript">Elm.ScanlineCost = Elm.ScanlineCost || {};
+<html><head><meta charset="UTF-8"><title>ScanlineCost</title><script type="text/javascript" src="/home/gideon/.cabal/share/Elm-0.12/elm-runtime.js"></script><script type="text/javascript">Elm.ScanlineCost = Elm.ScanlineCost || {};
 Elm.ScanlineCost.make = function (_elm)
                         {
                           "use strict";
@@ -35,23 +35,23 @@ Elm.ScanlineCost.make = function (_elm)
                                                       {
                                                         return function ()
                                                                {
-                                                                 var h = Basics.ceiling(ylen + xscale * 2);
-                                                                 var ylabels = _L.fromArray([Graphics.Collage.scale(xscale / 20)(Graphics.Collage.rotate(Basics.degrees(90))(Graphics.Collage.move({ctor: "_Tuple2", _0: (0 - xscale) / 2, _1: ylen / 2})(Graphics.Collage.toForm(Text.plainText("total number of loads")))))]);
-                                                                 var mkXLabel = function (_v0)
-                                                                                {
-                                                                                  return function ()
-                                                                                         {
-                                                                                           switch (_v0.ctor)
-                                                                                           {case
-                                                                                            "_Tuple2" :
-                                                                                              return Graphics.Collage.move({ctor: "_Tuple2", _0: xscale * (0.5 + Basics.toFloat(_v0._0)), _1: (0 - xscale) / 2})(Graphics.Collage.scale(xscale / 20)(Graphics.Collage.toForm(Text.plainText(_v0._1))));}
-                                                                                           _E.Case($moduleName,
-                                                                                                   "on line 42, column 28 to 120");
-                                                                                         }();
-                                                                                };
-                                                                 var xlabels = List.map(mkXLabel)(Util.enumerate(A2(List.map,
-                                                                                                                    Basics.fst,
-                                                                                                                    points)));
+                                                                 var h = Basics.ceiling(ylen + xscale * 3);
+                                                                 var yLabel = _L.fromArray([Graphics.Collage.scale(xscale / 15)(Graphics.Collage.rotate(Basics.degrees(90))(Graphics.Collage.move({ctor: "_Tuple2", _0: (0 - xscale) / 2, _1: ylen / 2})(Graphics.Collage.toForm(Text.plainText("cost  →")))))]);
+                                                                 var mkXTick = function (_v0)
+                                                                               {
+                                                                                 return function ()
+                                                                                        {
+                                                                                          switch (_v0.ctor)
+                                                                                          {case
+                                                                                           "_Tuple2" :
+                                                                                             return Graphics.Collage.move({ctor: "_Tuple2", _0: xscale * (0.5 + Basics.toFloat(_v0._0)), _1: (0 - xscale) / 2})(Graphics.Collage.scale(xscale / 20)(Graphics.Collage.toForm(Text.plainText(_v0._1))));}
+                                                                                          _E.Case($moduleName,
+                                                                                                  "on line 42, column 27 to 119");
+                                                                                        }();
+                                                                               };
+                                                                 var xTicks = List.map(mkXTick)(Util.enumerate(A2(List.map,
+                                                                                                                  Basics.fst,
+                                                                                                                  points)));
                                                                  var lineWidth = 2;
                                                                  var axesStyle = _U.replace([["width",
                                                                                               lineWidth],
@@ -118,15 +118,17 @@ Elm.ScanlineCost.make = function (_elm)
                                                                                             Graphics.Collage.move({ctor: "_Tuple2", _0: xlen, _1: 0})(A2(Graphics.Collage.rotate,
                                                                                                                                                          Basics.degrees(270),
                                                                                                                                                          arrowpoint))]);
+                                                                 var xLabel = _L.fromArray([Graphics.Collage.scale(xscale / 15)(Graphics.Collage.move({ctor: "_Tuple2", _0: xlen / 2, _1: -2.3 * xscale / 2})(Graphics.Collage.toForm(Text.plainText("job  →"))))]);
                                                                  var w = Basics.ceiling(xlen + xscale * 2);
                                                                  return A3(Graphics.Collage.collage,
                                                                            w,
                                                                            h,
-                                                                           _L.fromArray([Graphics.Collage.move({ctor: "_Tuple2", _0: (0 - xlen) / 2, _1: (0 - ylen) / 2})(Graphics.Collage.group(List.concat(_L.fromArray([arrows,
-                                                                                                                                                                                                                           bars,
-                                                                                                                                                                                                                           ylabels,
-                                                                                                                                                                                                                           xlabels,
-                                                                                                                                                                                                                           axes]))))]));
+                                                                           _L.fromArray([Graphics.Collage.move({ctor: "_Tuple2", _0: (0 - xlen) / 2, _1: (0 - ylen) / 2 + xscale})(Graphics.Collage.group(List.concat(_L.fromArray([arrows,
+                                                                                                                                                                                                                                    bars,
+                                                                                                                                                                                                                                    xLabel,
+                                                                                                                                                                                                                                    yLabel,
+                                                                                                                                                                                                                                    xTicks,
+                                                                                                                                                                                                                                    axes]))))]));
                                                                }();
                                                       });
                           var plotScheduleCost = F3(function (noJobs,mem,schedule)
@@ -160,7 +162,7 @@ Elm.ScanlineCost.make = function (_elm)
                                                                                            _L.append(cumulMisses,
                                                                                                      zeros)));
                                                                return A3(plotStaircaseGraph,
-                                                                         15,
+                                                                         14,
                                                                          300,
                                                                          points);
                                                              }();

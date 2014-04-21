@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html><head><meta charset="UTF-8"><title>PerformancePlot</title><script type="text/javascript" src="elm-runtime.js"></script><script type="text/javascript">Elm.PerformancePlot = Elm.PerformancePlot || {};
+<html><head><meta charset="UTF-8"><title>PerformancePlot</title><script type="text/javascript" src="/home/gideon/.cabal/share/Elm-0.12/elm-runtime.js"></script><script type="text/javascript">Elm.PerformancePlot = Elm.PerformancePlot || {};
 Elm.PerformancePlot.make = function (_elm)
                            {
                              "use strict";
@@ -19,6 +19,7 @@ Elm.PerformancePlot.make = function (_elm)
                              Graphics.Element = Elm.Graphics.Element.make(_elm);
                              var List = Elm.List.make(_elm);
                              var Maybe = Elm.Maybe.make(_elm);
+                             var Mouse = Elm.Mouse.make(_elm);
                              var Native = Native || {};
                              Native.Json = Elm.Native.Json.make(_elm);
                              var Native = Native || {};
@@ -80,7 +81,7 @@ Elm.PerformancePlot.make = function (_elm)
                                                                                                             {ctor: "_Tuple2", _0: Basics.toFloat(_v0._0) * xscale, _1: Basics.toFloat(_v0._1) * yscale},
                                                                                                             f);}
                                                                                                _E.Case($moduleName,
-                                                                                                       "on line 72, column 30 to 77");
+                                                                                                       "on line 93, column 30 to 77");
                                                                                              }();
                                                                                     });
                                                                 var costPoints = A2(List.concatMap,
@@ -95,7 +96,7 @@ Elm.PerformancePlot.make = function (_elm)
                                                                                                             drawFormAt(_v4._0),
                                                                                                             _v4._1);}
                                                                                                _E.Case($moduleName,
-                                                                                                       "on line 73, column 44 to 65");
+                                                                                                       "on line 94, column 44 to 65");
                                                                                              }();
                                                                                     },
                                                                                     curves);
@@ -162,9 +163,38 @@ Elm.PerformancePlot.make = function (_elm)
                                                                                                                                   lst,
                                                                                                                                   clock)));
                                                });
+                             var $switch = F2(function (a,b)
+                                              {
+                                                return Signal.lift(function (c)
+                                                                   {
+                                                                     return c ? a : b;
+                                                                   });
+                                              });
                              var main = function ()
                                         {
-                                          var clock = Time.fps(6);
+                                          var isRunning = Util.toggleOnce(Mouse.clicks);
+                                          var clock = A3(Signal.keepWhen,
+                                                         isRunning,
+                                                         Time.second,
+                                                         Time.fps(6));
+                                          var mkLegendItem = function (_v8)
+                                                             {
+                                                               return function ()
+                                                                      {
+                                                                        switch (_v8.ctor)
+                                                                        {case
+                                                                         "_Tuple2" :
+                                                                           return A2(Graphics.Element.flow,
+                                                                                     Graphics.Element.right,
+                                                                                     _L.fromArray([A3(Graphics.Collage.collage,
+                                                                                                      15,
+                                                                                                      15,
+                                                                                                      _L.fromArray([_v8._0])),
+                                                                                                   Text.plainText(_v8._1)]));}
+                                                                        _E.Case($moduleName,
+                                                                                "on line 36, column 36 to 85");
+                                                                      }();
+                                                             };
                                           var scanDot = Graphics.Collage.alpha(0.8)(Graphics.Collage.scale(1.5)(Graphics.Collage.filled(Color.red)(Graphics.Collage.polygon(_L.fromArray([{ctor: "_Tuple2", _0: -2, _1: -1},
                                                                                                                                                                                           {ctor: "_Tuple2", _0: 2, _1: -1},
                                                                                                                                                                                           {ctor: "_Tuple2", _0: 0, _1: 2}])))));
@@ -172,17 +202,35 @@ Elm.PerformancePlot.make = function (_elm)
                                                                                                                             4,
                                                                                                                             4)));
                                           var h = 300;
-                                          var w = 600;
-                                          var plot = F2(function (sierpPerf,scanPerf)
+                                          var w = 580;
+                                          var plot = F3(function (sierpPerf,scanPerf,st)
                                                         {
-                                                          return A5(plotCostCurves,
-                                                                    w,
-                                                                    h,
-                                                                    "mem capacity →",
-                                                                    "cost →",
-                                                                    _L.fromArray([{ctor: "_Tuple2", _0: sierpDot, _1: sierpPerf},
-                                                                                  {ctor: "_Tuple2", _0: scanDot, _1: scanPerf}]));
+                                                          return A2(Graphics.Element.flow,
+                                                                    Graphics.Element.outward,
+                                                                    _L.fromArray([A5(plotCostCurves,
+                                                                                     w,
+                                                                                     h,
+                                                                                     "mem capacity →",
+                                                                                     "cost →",
+                                                                                     _L.fromArray([{ctor: "_Tuple2", _0: sierpDot, _1: sierpPerf},
+                                                                                                   {ctor: "_Tuple2", _0: scanDot, _1: scanPerf}])),
+                                                                                  A3(Graphics.Element.container,
+                                                                                     w,
+                                                                                     h,
+                                                                                     Graphics.Element.topRight)(Graphics.Element.flow(Graphics.Element.down)(A2(List.map,
+                                                                                                                                                                mkLegendItem,
+                                                                                                                                                                _L.fromArray([{ctor: "_Tuple2", _0: sierpDot, _1: "Sierpinski schedule"},
+                                                                                                                                                                              {ctor: "_Tuple2", _0: scanDot, _1: "Scanline Schedule"}])))),
+                                                                                  st]));
                                                         });
+                                          var playButton = A3(Graphics.Element.container,
+                                                              w,
+                                                              h,
+                                                              Graphics.Element.middle)(Text.plainText("click to start simulation"));
+                                          var playButtonSw = A3($switch,
+                                                                Graphics.Element.empty,
+                                                                playButton,
+                                                                isRunning);
                                           var noStations = 64;
                                           var perf = function (sched)
                                                      {
@@ -198,10 +246,14 @@ Elm.PerformancePlot.make = function (_elm)
                                           var sierp = Schedule.sierpinski(noStations);
                                           var scan = Schedule.scanline(noStations);
                                           return A2(Signal._op["~"],
-                                                    A2(Signal._op["<~"],plot,A2(perf,sierp,clock)),
-                                                    A2(perf,scan,clock));
+                                                    A2(Signal._op["~"],
+                                                       A2(Signal._op["<~"],
+                                                          plot,
+                                                          A2(perf,sierp,clock)),
+                                                       A2(perf,scan,clock)),
+                                                    playButtonSw);
                                         }();
-                             _elm.PerformancePlot.values = {_op: _op, main: main, pacedMap: pacedMap, plotCostCurves: plotCostCurves};
+                             _elm.PerformancePlot.values = {_op: _op, main: main, $switch: $switch, pacedMap: pacedMap, plotCostCurves: plotCostCurves};
                              return _elm.PerformancePlot.values;
                            };Elm.Simulator = Elm.Simulator || {};
 Elm.Simulator.make = function (_elm)
