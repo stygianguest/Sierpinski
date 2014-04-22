@@ -35,10 +35,12 @@ cacheState mem sched =
 cacheMisses : Int -> Schedule -> [Int]
 cacheMisses mem sched =
     let caches = cacheState mem sched
-        cntMisses (i,j) cache = 
-            toInt (cache `contains` i) + toInt (i == j || contains cache j)
-        toInt b = if b then 0 else 1
-    in zipWith cntMisses sched caches
+    in zipWith (uncurry jobCost) sched caches
+
+jobCost : Int -> Int -> Cache -> Int
+jobCost i j cache = 
+    let toInt b = if b then 0 else 1
+    in toInt (cache `contains` i) + toInt (i == j || contains cache j)
 
 totalCacheMisses : Int -> Schedule -> Int
 totalCacheMisses mem = sum . cacheMisses mem

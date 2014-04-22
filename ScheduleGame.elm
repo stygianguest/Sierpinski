@@ -7,7 +7,7 @@ import Window
 
 import Schedule
 import Simulator
-import Util(repeatN, enumerate)
+import Util(repeatN, enumerate, (!!))
 
 --main : Signal Element
 main = 
@@ -48,8 +48,8 @@ execCmd : Command -> SimulatorState -> SimulatorState
 execCmd cmd state =
     case cmd of
     ScheduleJob i j -> { state | schedule <- (if state.schedule `Schedule.contains` (i,j) then Schedule.remove (i,j) else Schedule.append (i,j)) state.schedule }
-    IncMemory -> { state | memorySize <- state.memorySize + 1 }
-    DecMemory -> { state | memorySize <- state.memorySize - 1 }
+    IncMemory -> { state | memorySize <- (state.memorySize + 1) `min` noStations}
+    DecMemory -> { state | memorySize <- (state.memorySize - 1) `max` 2}
     ResetSchedule -> { state | schedule <- Schedule.scanline noStations }
 
 -- DISPLAY
@@ -66,10 +66,12 @@ drawButtons mem sched =
         titleRow = flow right titles
         titleCol = flow down <| container s s middle empty :: titles
 
-        bCircle a = collage s s [filled (rgba 1 1 1 a) (circle 10)]
         jobButton i j =
             let cmd = ScheduleJob i j
-            in Input.customButton commands.handle cmd (bCircle 0.2) (bCircle 0.5) (bCircle 0.8)
+                cost = Simulator.jobCost i j cache --only values are 0,1,2
+                bColor = [green, yellow, red] !! cost
+                bCircle a = collage s s [alpha a <| filled bColor (circle 10), toForm <| plainText <| show cost]
+            in Input.customButton commands.handle cmd (bCircle 0.8) (bCircle 0.5) (bCircle 0.7)
 
         mkRow i = flow right <| map (jobButton i) [1..i]
         buttonMatrix = flow down <| map mkRow [1..noStations]
@@ -77,27 +79,35 @@ drawButtons mem sched =
         path = Schedule.drawSchedule buttonSize noStations sched
 
         emptyControllCell = container (s*2) s middle empty
-        costCellTitle = container (s*2) s topLeft <| leftAligned <| bold <| Text.height (s/3) <| toText "cost:"
+        costCellTitle t = container (s*2) s topLeft <| leftAligned <| bold <| Text.height (s/3) <| toText t
         costCell c = container (s*2) s bottomRight . centered . bold . Text.height s . toText <| show c
-        memoryControllCell i = container (s*2) s middle <| memCellText (show i)
-        memCellText = centered . Text.height s . toText
-        memCellTitle = container (s*2) s midBottom <| leftAligned <| Text.height (s/3) <| toText "memory:"
+        --memoryControllCell i = container (s*2) s middle <| memCellText (show i)
+        --memCellText = centered . Text.height s . toText
+        --memCellTitle = container (s*2) s midBottom <| leftAligned <| Text.height (s/3) <| toText "memory:"
+        incMemoryButton =
+            let filler = container (s `div` 3) (s `div` 3) middle . link "#" . centered . Text.height (s/2) . bold <| toText "+"
+                button = Input.customButton commands.handle IncMemory filler filler filler
+            in container (s*2 + (s `div` 2)) s topRight button
+        decMemoryButton =
+            let filler = container (s `div` 3) (s `div` 3) middle . link "#" . centered . Text.height (s/2) . bold <| toText "-"
+                button = Input.customButton commands.handle DecMemory filler filler filler
+            in container (s*2 + (s `div` 2)) s midRight button
 
         controlsWidth = 3*s
         controlsHeight = (noStations+2) * s
         controls = 
-            container controlsWidth controlsHeight middle 
-            <| color black <| container (controlsWidth) (noStations * s) middle
-            <| color white <| container (controlsWidth - 4) (noStations * s - 4) midTop
+            container controlsWidth controlsHeight midTop
+            <| color black <| container (controlsWidth) (2 * s) middle
+            <| color white <| container (controlsWidth - 4) (2 * s - 4) midTop
             <| flow down <|
-                [ flow outward [costCell cost, costCellTitle]
-                , memCellTitle
-                ] ++ map memoryControllCell cache
+                [ flow outward [costCell cost, costCellTitle "cost:"]
+                , flow outward [costCell mem, costCellTitle "mem:", incMemoryButton, decMemoryButton]
+                ] --++ map memoryControllCell (snd cache)
 
-        cache = snd . last <| Simulator.cacheState mem sched
+        cache = last <| Simulator.cacheState mem sched
         cost = sum <| Simulator.cacheMisses mem sched
 
-        matrix = flow down [titleRow, flow outward [path, buttonMatrix], titleRow]
+        matrix = flow down [titleRow, flow outward [buttonMatrix, path], titleRow]
 
     in flow right [titleCol, matrix, titleCol, spacer 20 20, controls]
 
