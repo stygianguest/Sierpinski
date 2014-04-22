@@ -15,7 +15,7 @@ plotScheduleCost noJobs mem schedule =
     let cumulMisses = if isEmpty schedule then [] else scanl1 (+) <| Simulator.cacheMisses mem schedule
         points = map (\(i,j) -> (show i, j)) <| zip [1..noJobs] (cumulMisses++zeros)
         zeros = repeatN (noJobs - length schedule) 0
-    in plotStaircaseGraph 15 (300) points
+    in plotStaircaseGraph 14 300 points
 
 -- please don't look at this code
 -- thank you for your discretion
@@ -38,11 +38,12 @@ plotStaircaseGraph xscale ylen points =
             let x' = toFloat x * xscale
                 y' = toFloat y * yscale
             in move (x' + xscale/1.9, y'/2) <| group [filled blue <| rect (xscale * 0.9) y', scale (xscale/20) <| toForm <| plainText <| show y]
-        xlabels = map mkXLabel <| enumerate <| map fst points
-        mkXLabel (i,str) = move (xscale * (0.5 + toFloat i), -xscale/2) <| scale (xscale/20) <| toForm <| plainText str
-        ylabels = [scale (xscale/20) <| rotate (degrees 90) <| move (-xscale/2, ylen/2) <| toForm <| plainText "total number of loads"]
+        xTicks = map mkXTick <| enumerate <| map fst points
+        mkXTick (i,str) = move (xscale * (0.5 + toFloat i), -xscale/2) <| scale (xscale/20) <| toForm <| plainText str
+        xLabel = [scale (xscale/15) <| move (xlen/2, -2.3 * xscale/2) <| toForm <| plainText "job  →"]
+        yLabel = [scale (xscale/15) <| rotate (degrees 90) <| move (-xscale/2, ylen/2) <| toForm <| plainText "cost  →"]
         w = ceiling <| xlen + xscale*2
-        h = ceiling <| ylen + xscale*2
+        h = ceiling <| ylen + xscale*3
     --in asText (enumerate <| map fst points)
     -- just know that I am as disappointed in you as you are in me
-    in collage w h [move (-xlen/2, -ylen/2) <| group <| concat [arrows,bars,ylabels,xlabels,axes]]
+    in collage w h [move (-xlen/2, -ylen/2 + xscale) <| group <| concat [arrows,bars,xLabel,yLabel,xTicks,axes]]
