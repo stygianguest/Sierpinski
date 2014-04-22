@@ -3,13 +3,7 @@
 
 <h1>Fractals for Fun and Profit</h1>
 
-<p>
-Unlike me, my wife uses computers for serious calculations to answer important questions.
-One of these problems involves taking the cross-correlations of the continuous seismic data of hundreds of measuring stations.
-A computation that can take days or even weeks.
-Interestingly, it turns out that a large part of this time is spent loading data from disks into memory.
-To better understand the problem, let us take a high-level look at the calculation of cross-correlations in Pythonesque pseudo-code:
-</p>
+<p> Unlike me, my wife uses computers for serious calculations to answer important questions.  One of these problems involves taking the cross-correlations of the continuous seismic data of hundreds of measuring stations.  A computation that can take days or even weeks.  Interestingly, it turns out that a large part of this time is spent loading data from disks into memory.  To better understand the problem, let us take a high-level look at the calculation of cross-correlations in Pythonesque pseudo-code: </p>
 
 <pre>
 # given is some list of stations, say a list of names of the data files
@@ -22,115 +16,81 @@ for i in range(len(stations)) :
         computation(stations[i], stations[j])
 </pre>
 
-<p>
-The pseudo-code traverses all possible combinations of two stations and computes the so called cross-correlation.
-Each station's signal consists of a large data-file that is stored on disk and must be loaded into memory to compute the correlation.
-Loading memory from disk is an expensive operation, because even modern disks are slow compared to the processor and memory.
-Luckily the system caches data, i.e., it reuses data that is still stored in memory in stead of reloading it.
-The memory has limited capacity.
-When the memory is full, data that is not yet in the memory will replace the least recently used data.
-</p>
+<p> The pseudo-code traverses all possible combinations of two stations and computes the so called cross-correlation.  Each station's signal consists of a large data-file that is stored on disk and must be loaded into memory to compute the correlation.  Loading memory from disk is an expensive operation, because even modern disks are slow compared to the processor and memory.  Luckily the system caches data, i.e., it reuses data that is still stored in memory in stead of reloading it.  But the system has limited and varying (on a shared system) memory capacity.  When the memory is full, data that is not yet in the memory will replace the least recently used data.  </p>
 
-<p>
-Thus the order in which we access the station's data - the so called schedule - determines the number of disk accesses.
-The question is, what schedule minimizes the number of disk reads and maximize the use of the cache.
-</p>
+<p> Thus the order in which we access the station's data - the so called schedule - determines the number of disk accesses.  The question is, what schedule minimizes the number of disk reads and maximize the use of the cache. Moreover, what can we do without knowing the size of the memory? </p>
+
+<p> As I found out two years ago the Sierpinski fractal curve provides a good, and probably asymptotically optimal, schedule. For my and (hopefully) your amusement, I've now rewritten some of the experiments in the programming language <a href="http://elm-lang.org">Elm</a> to present the elegant Sierpinsky curve and its discretized brother the H-index.</p>
 
 
 <h2>Computing the Cost of a Schedule</h2>
 
-<p>
-The schedule can be visualized as a path through a square matrix where each cell consists of a combination of two stations.
-Such a combination is called a job.
-Only the lower (or upper) triangle of the matrix need to be visited as we consider (3,4) a duplicate of (4,3).
-The pseudo-code above consists in the following schedule that we call the scanline schedule.
-</p>
+<p> The schedule can be visualized as a path through a square matrix where each cell consists of a combination of two stations.  Such a combination is called a job.  Only the lower (or upper) triangle of the matrix need to be visited as we consider (3,4) a duplicate of (4,3).  The pseudo-code above consists in the following schedule that we call the scanline schedule.  </p>
 
-<center><a name="ScanlineSchedule"><iframe src="ScanlineSchedule.html" width=400 height=400 frameborder=0></iframe></a></center>
+<center><a name="ScanlineSchedule"><iframe src="http://stygianguest.github.io/Sierpinski/ScanlineSchedule.html" width=400 height=400 frameborder=0></iframe></a></center>
 
-<p>
-The displayed schedule thus starts correlating station 1 with itself, then correlates 1 with 2, 2 with 2, etc.
-The cost - in terms of the number of disk accesses or cache misses - of this schedule can be computed by simulating the execution while keeping track of the cache's contents and counting the number of times we load a station's data that is not yet in memory.
-Running such a simulation with memory capacity for five elements gives the following cumulative cost for the successive executions.
-</p>
+<p> The displayed schedule thus starts correlating station 1 with itself, then correlates 1 with 2, 2 with 2, etc.  The cost - in terms of the number of disk accesses or cache misses - of this schedule can be computed by simulating the execution while keeping track of the cache's contents and counting the number of times we load a station's data that is not yet in memory.  Running such a simulation with memory capacity for five elements gives the following cumulative cost for the successive executions.  </p>
 
-<center><a name="ScanlineCost"><iframe src="ScanlineCost.html" width=600 height=400 frameborder=0></iframe></a></center>
+<center><a name="ScanlineCost"><iframe src="http://stygianguest.github.io/Sierpinski/ScanlineCost.html" width=600 height=350 frameborder=0></iframe></a></center>
 
-<p>
-The cumulative cost shows that the scanline schedule initially (up to 15) performs quite well, but once the horizontal stretches of the schedule are longer than 5 each new job results in a cache miss.
-In fact, one can do quite a bit better by making shorter stretches.
-Give it a try!
-</p>
+<p> The cumulative cost shows that the scanline schedule initially (up to 15) performs quite well, but once the horizontal stretches of the schedule are longer than 5 each new job results in a cache miss.  In fact, one can do quite a bit better by making shorter stretches.  Give it a try!  </p>
 
-<center><a name="ScheduleGame"><iframe src="ScheduleGame.html" width=600 height=400 frameborder=0></iframe></a></center>
+<center><a name="ScheduleGame"><iframe src="http://stygianguest.github.io/Sierpinski/ScheduleGame.html" width=600 height=400 frameborder=0></iframe></a></center>
 
-<p>
-The above little applet allows you to create a schedule by clicking on the jobs and computes the total number of disk accesses at the time of each successive job in the schedule.
-Also shown is are the contents of the cache after execution of the last job in the schedule.
-To compute the number of disk accesses we assume the memory can cache the data of 5 stations and always replaces the least recently used element in cache.
-</p>
+<p> The above little applet allows you to create a schedule by clicking on the jobs and computes the total number of disk accesses at the time of each successive job in the schedule.
+Also displayed is the cost, i.e., the total number of cache misses for the created schedule and memory size.
+To help you make a path, unscheduled elements in the path have been marked with their cost.
+You can also change the size of the memory to see how your schedule performs for a given capacity.</p>
 
 
 <h2>The Sierpinsky Curve or H-Index</h2>
 
+<p> It turns out to be quite challenging to find the best schedule with the least disk accesses.  Some experimenting also shows that the performance of a schedule changes quite a bit for different memory sizes.  That complicates our task, especially considering that memory capacity may change during execution.  For example, when the correlations are done on a supercomputer that is shared by other scientists running similar experiments.  </p>
+
+<p> However, one quickly notices that it is generally better not to make large jumps.  That is, to make a schedule where the most recent jobs are close together in the matrix.  This observation leads to a divide and conquer strategy, where we subdivide the triangle of jobs into smaller triangles and schedule the jobs in the first triangle before the second.  Applying this pattern recursively, we get the following sequence.  </p>
+
+<center><a name="SierpinskyCurve"><iframe src="http://stygianguest.github.io/Sierpinski/SierpinskyCurve.html" width=300 height=300 frameborder=0></iframe></a></center>
+
 <p>
-It turns out to be quite challenging to find the best schedule with the least disk accesses.
-Some experimenting also shows that the performance of a schedule changes quite a bit for different memory sizes.
-That complicates our task, especially considering that the available memory often changes during execution. 
-For example, when the correlations are done on a supercomputer that is shared by other scientists running similar experiments.
+In addition to the subdivision of triangles, a line is drawn that visits each of the triangles exactly once.
+The line is the (lower triangle of the) <a href="http://en.wikipedia.org/wiki/Sierpinski_curve">Sierpinsky curve</a> a fractal curve that, when the subdivision is repeated infinitely, will visit each point in the triangle without every crossing itself.
 </p>
 
-<p>
-However, one quickly notices that it is generally better not to make large jumps.
-That is, to make a schedule where the most recent jobs are close together in the matrix.
-This leads to a divide and conquer strategy, where we subdivide the triangle of jobs into smaller triangles and schedule the jobs in the first triangle before the second.
-Applying this pattern recursively, we get the following sequence.
+<p> Now, consider the triangle of jobs to be scheduled and subdivide it recursively in smaller triangles until all triangles consist of exactly one job.  The Sierpinsky curve through the triangles now describes a schedule!  </p>
+
+<p> Well almost: the jobs cannot properly be subdivided in triangles because jobs cannot be split.  Therefore, we use the discrete incarnation of the Sierpinski curve that is called the <a href="http://www.sciencedirect.com/science/article/pii/S0166218X00003267">H-index</a>.  In this context "index" is another word for schedule and the H stands for the shape the pattern takes: there's an H on its side in the lower right corner. The H-index defines the following schedule:</p>
+
+<center><a name="HIndex"><iframe src="http://stygianguest.github.io/Sierpinski/HIndex.html" width=400 height=400 frameborder=0></iframe></a></center>
+
+<p>For a precise description I refer to the paper, 
+
+<p>The strength of the H-index is that it has very good locality: any two jobs that are scheduled closely together (in time) will also be close together (in distance) in the matrix of jobs.
+This is good, because jobs that are close in the matrix are more likely to be in the cache.
 </p>
 
+<p>How much better does the H-index do?  The following graph plots the cost in termes of cache misses of each schedule for a case with 64 stations and therefore 576 jobs for increasing memory capacity.  </p>
 
-<center><a name="SierpinskyCurve"><iframe src="SierpinskyCurve.html" width=300 height=300 frameborder=0></iframe></a></center>
+<center><a name="PerformancePlot"><iframe src="http://stygianguest.github.io/Sierpinski/PerformancePlot.html" width=600 height=300 frameborder=0></iframe></a></center>
 
-<p>
-The schedule based on the Sierpinsky curve doesn't look quite the same because we cannot properly subdivide the triangle that consists of discrete jobs.
-In stead, we use a variant that is called the H-index.
-In this context "index" is another word for schedule and the H stands for the shape the pattern takes: there's an H on its side in the lower right corner.
-</p>
-
-<center><a name="HIndex"><iframe src="HIndex.html" width=400 height=400 frameborder=0></iframe></a></center>
-
-<p>
-How much better does the H-index do?
-The following graph plots the cost in termes of cache misses of each schedule for a case with 64 stations and therefore 576 jobs for varying amounts of memory.
-</p>
-
-<center><a name="PerformancePlot"><iframe src="PerformancePlot.html" width=600 height=400 frameborder=0></iframe></a></center>
-
-<p>
-The range is limited from 2 to 64: one needs to be able to store at least two and if memory has capacity for 64 stations all schedules will have cost 64 because every job has to be loaded exactly once.
-The cost of the scanline algorithm is dominated by a linear relation also seen in the last part (after job 16) in the <a href="#ScanlineCost">previous job</a>.
-One may also note that the H-index performs best when the memory capacity is a power of two, note in particular the low points at 4, 8 and 16.
-In between those spots the H-index becomes slightly irregular but generally the plotted curve shows a logarithmic 
-<p>
-
+<p> The range is limited from 2 to 64: one needs to be able to store at least two and if memory has capacity for 64 stations all schedules will have cost 64 because every job has to be loaded exactly once.  The cost of the scanline algorithm is dominated by a linear relation also seen in the last part (after job 16) in the <a href="#ScanlineCost">previous job</a>.  One may also note that the H-index performs best when the memory capacity is a power of two, note in particular the low points at 4, 8 and 16.  In between those spots the H-index becomes slightly irregular but generally the plotted curve shows a logarithmic <p>
 
 <h2>Conclusion</h2>
 
-Hopefully the <a href="#PerformancePlot">final plot</a> convinces you that the Sierpinski curve, or more accurately, H-index performs much better than the scanline schedule.
-However, I have not proven that the H-index is the optimal schedule.
-In fact, one can easily show that for certain memory sizes, such as in the <a href="#ScheduleGame">manual scheduling exercise</a>, it is possible to do (slightly) better than the H-index.
-<a href="http://www.sciencedirect.com/science/article/pii/S0166218X00003267">Rolf Niedermeiera, Klaus Reinhardt and Peter Sanders</a>, who invented the H-index, have given strong evidence that it is asymptotically optimal.
+<p>Hopefully the <a href="#PerformancePlot">final plot</a> convinces you that the Sierpinski curve, or more accurately, H-index performs much better than the scanline schedule.  However, I have not proven that the H-index is the optimal schedule.  In fact, one can easily show that for certain memory sizes, such as in the <a href="#ScheduleGame">manual scheduling exercise</a>, it is possible to do (slightly) better than the H-index.  <a href="http://www.sciencedirect.com/science/article/pii/S0166218X00003267">Rolf Niedermeiera, Klaus Reinhardt and Peter Sanders</a>, who invented the H-index, have given strong evidence that it is asymptotically optimal. </p>
 
+<p>Does this mean we should remove all matrix traversals based on nested for loops - the scanline schedule - and replace them with with a H-index based traversel?  Probably not.  Much has been done to optimize such loops in compilers to fine-tune their caching behavior. 
+The experiment presented here only took into account a very special case and has many assumptions on the behavior of the cache that will not hold for many systems.
+For example, <a href="http://en.wikipedia.org/wiki/CPU_cache">cpu caches</a> typically use different replacement strategies; they do not simply replace the least recently used element if it is full.
+Yet, the Sierpinsky curve and H-index have found their way into many computing-intensive applications, from image processing to databases, and may also benefit you. </p>
+
+<p>This post is too small to introduce a practical incarnation of the curve.
+An attentive reader may have noticed that I've only used examples where the number of stations is a power of two.  This is no coincidence: the H-index is really only defined for those sizes.  One can, however, adapt the index for larger sizes in ways that most of the schedule will be according to the h-index. Practical applications and their empirical evaluation is left to future work (tm). </p>
 
 <h2>Post Scriptum</h2>
 
-An attentive reader may have noticed that I've only used examples where the number of stations is a power of two.
-This is no coincidence: the H-index is really only defined for those sizes.
-One can, however, adapt the index for larger sizes in ways that most of the schedule will be according to the h-index.
-Exploring the different solutions would be an interesting project.
+<p> As for my previous project in Elm, I had fun writing this.  Working with such a new language is an interesting experience: one one hand you are exploring new ways to do things, but on the other hand you have to reinvent the wheel all the time.  It certainly makes you appreciate the time and effort spent by others on libraries in more mature languages.  For example, I spent an inordinate amount of time on the plots, at times resulting in atrocious code. </p>
 
-In fact, the problem treated here is a simple instance of a large number of optimization problems where the Sierpinski curve can be used.
-Most importantly, the H-index is applied for multi-dimensional problems where we would have two or more lists of different 'stations'.
-In that case the H-index covers the entire matrix and not just the lower triangle.
+<p> You are free to look at/steal <a href="https://github.com/stygianguest/Sierpinski">the code</a> but you're going against doctor's orders.</p>
 
 </body>
 </html>
