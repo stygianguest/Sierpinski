@@ -62,12 +62,16 @@ Elm.ScheduleGame.make = function (_elm)
                                                       {case
                                                        "DecMemory" :
                                                          return _U.replace([["memorySize",
-                                                                             state.memorySize - 1]],
+                                                                             A2(Basics.max,
+                                                                                state.memorySize - 1,
+                                                                                2)]],
                                                                            state);
                                                        case
                                                        "IncMemory" :
                                                          return _U.replace([["memorySize",
-                                                                             state.memorySize + 1]],
+                                                                             A2(Basics.min,
+                                                                                state.memorySize + 1,
+                                                                                noStations)]],
                                                                            state);
                                                        case
                                                        "ResetSchedule" :
@@ -93,9 +97,9 @@ Elm.ScheduleGame.make = function (_elm)
                                                           var cost = List.sum(A2(Simulator.cacheMisses,
                                                                                  mem,
                                                                                  sched));
-                                                          var cache = Basics.snd(List.last(A2(Simulator.cacheState,
-                                                                                              mem,
-                                                                                              sched)));
+                                                          var cache = List.last(A2(Simulator.cacheState,
+                                                                                   mem,
+                                                                                   sched));
                                                           var path = A3(Schedule.drawSchedule,
                                                                         buttonSize,
                                                                         noStations,
@@ -122,32 +126,38 @@ Elm.ScheduleGame.make = function (_elm)
                                                                                                                                           s,
                                                                                                                                           Graphics.Element.middle,
                                                                                                                                           Graphics.Element.empty), _1: titles});
-                                                          var bCircle = function (a)
-                                                                        {
-                                                                          return A3(Graphics.Collage.collage,
-                                                                                    s,
-                                                                                    s,
-                                                                                    _L.fromArray([A2(Graphics.Collage.filled,
-                                                                                                     A4(Color.rgba,
-                                                                                                        1,
-                                                                                                        1,
-                                                                                                        1,
-                                                                                                        a),
-                                                                                                     Graphics.Collage.circle(10))]));
-                                                                        };
                                                           var jobButton = F2(function (i,j)
                                                                              {
                                                                                return function ()
                                                                                       {
+                                                                                        var cost = A3(Simulator.jobCost,
+                                                                                                      i,
+                                                                                                      j,
+                                                                                                      cache);
+                                                                                        var bColor = A2(Util._op["!!"],
+                                                                                                        _L.fromArray([Color.green,
+                                                                                                                      Color.yellow,
+                                                                                                                      Color.red]),
+                                                                                                        cost);
+                                                                                        var bCircle = function (a)
+                                                                                                      {
+                                                                                                        return A3(Graphics.Collage.collage,
+                                                                                                                  s,
+                                                                                                                  s,
+                                                                                                                  _L.fromArray([Graphics.Collage.alpha(a)(A2(Graphics.Collage.filled,
+                                                                                                                                                             bColor,
+                                                                                                                                                             Graphics.Collage.circle(10))),
+                                                                                                                                Graphics.Collage.toForm(Text.plainText(String.show(cost)))]));
+                                                                                                      };
                                                                                         var cmd = A2(ScheduleJob,
                                                                                                      i,
                                                                                                      j);
                                                                                         return A5(Graphics.Input.customButton,
                                                                                                   commands.handle,
                                                                                                   cmd,
-                                                                                                  bCircle(0.2),
+                                                                                                  bCircle(0.8),
                                                                                                   bCircle(0.5),
-                                                                                                  bCircle(0.8));
+                                                                                                  bCircle(0.7));
                                                                                       }();
                                                                              });
                                                           var mkRow = function (i)
@@ -166,18 +176,21 @@ Elm.ScheduleGame.make = function (_elm)
                                                                           _L.fromArray([titleRow,
                                                                                         A2(Graphics.Element.flow,
                                                                                            Graphics.Element.outward,
-                                                                                           _L.fromArray([path,
-                                                                                                         buttonMatrix])),
+                                                                                           _L.fromArray([buttonMatrix,
+                                                                                                         path])),
                                                                                         titleRow]));
                                                           var emptyControllCell = A4(Graphics.Element.container,
                                                                                      s * 2,
                                                                                      s,
                                                                                      Graphics.Element.middle,
                                                                                      Graphics.Element.empty);
-                                                          var costCellTitle = A3(Graphics.Element.container,
-                                                                                 s * 2,
-                                                                                 s,
-                                                                                 Graphics.Element.topLeft)(Text.leftAligned(Text.bold(Text.height(s / 3)(Text.toText("cost:")))));
+                                                          var costCellTitle = function (t)
+                                                                              {
+                                                                                return A3(Graphics.Element.container,
+                                                                                          s * 2,
+                                                                                          s,
+                                                                                          Graphics.Element.topLeft)(Text.leftAligned(Text.bold(Text.height(s / 3)(Text.toText(t)))));
+                                                                              };
                                                           var costCell = function (c)
                                                                          {
                                                                            return A3(Graphics.Element.container,
@@ -185,40 +198,63 @@ Elm.ScheduleGame.make = function (_elm)
                                                                                      s,
                                                                                      Graphics.Element.bottomRight)(Text.centered(Text.bold(Text.height(s)(Text.toText(String.show(c))))));
                                                                          };
-                                                          var memCellText = function ($)
-                                                                            {
-                                                                              return Text.centered(Text.height(s)(Text.toText($)));
-                                                                            };
-                                                          var memoryControllCell = function (i)
-                                                                                   {
-                                                                                     return A3(Graphics.Element.container,
-                                                                                               s * 2,
-                                                                                               s,
-                                                                                               Graphics.Element.middle)(memCellText(String.show(i)));
-                                                                                   };
-                                                          var memCellTitle = A3(Graphics.Element.container,
-                                                                                s * 2,
-                                                                                s,
-                                                                                Graphics.Element.midBottom)(Text.leftAligned(Text.height(s / 3)(Text.toText("memory:"))));
+                                                          var incMemoryButton = function ()
+                                                                                {
+                                                                                  var filler = A3(Graphics.Element.container,
+                                                                                                  s / 3 | 0,
+                                                                                                  s / 3 | 0,
+                                                                                                  Graphics.Element.middle)(Graphics.Element.link("#")(Text.centered(Text.height(s / 2)(Text.bold(Text.toText("+"))))));
+                                                                                  var button = A5(Graphics.Input.customButton,
+                                                                                                  commands.handle,
+                                                                                                  IncMemory,
+                                                                                                  filler,
+                                                                                                  filler,
+                                                                                                  filler);
+                                                                                  return A4(Graphics.Element.container,
+                                                                                            s * 2 + (s / 2 | 0),
+                                                                                            s,
+                                                                                            Graphics.Element.topRight,
+                                                                                            button);
+                                                                                }();
+                                                          var decMemoryButton = function ()
+                                                                                {
+                                                                                  var filler = A3(Graphics.Element.container,
+                                                                                                  s / 3 | 0,
+                                                                                                  s / 3 | 0,
+                                                                                                  Graphics.Element.middle)(Graphics.Element.link("#")(Text.centered(Text.height(s / 2)(Text.bold(Text.toText("-"))))));
+                                                                                  var button = A5(Graphics.Input.customButton,
+                                                                                                  commands.handle,
+                                                                                                  DecMemory,
+                                                                                                  filler,
+                                                                                                  filler,
+                                                                                                  filler);
+                                                                                  return A4(Graphics.Element.container,
+                                                                                            s * 2 + (s / 2 | 0),
+                                                                                            s,
+                                                                                            Graphics.Element.midRight,
+                                                                                            button);
+                                                                                }();
                                                           var controlsWidth = 3 * s;
                                                           var controlsHeight = (noStations + 2) * s;
                                                           var controls = A3(Graphics.Element.container,
                                                                             controlsWidth,
                                                                             controlsHeight,
-                                                                            Graphics.Element.middle)(Graphics.Element.color(Color.black)(A3(Graphics.Element.container,
+                                                                            Graphics.Element.midTop)(Graphics.Element.color(Color.black)(A3(Graphics.Element.container,
                                                                                                                                             controlsWidth,
-                                                                                                                                            noStations * s,
+                                                                                                                                            2 * s,
                                                                                                                                             Graphics.Element.middle)(Graphics.Element.color(Color.white)(A3(Graphics.Element.container,
                                                                                                                                                                                                             controlsWidth - 4,
-                                                                                                                                                                                                            noStations * s - 4,
-                                                                                                                                                                                                            Graphics.Element.midTop)(Graphics.Element.flow(Graphics.Element.down)(_L.append(_L.fromArray([A2(Graphics.Element.flow,
-                                                                                                                                                                                                                                                                                                             Graphics.Element.outward,
-                                                                                                                                                                                                                                                                                                             _L.fromArray([costCell(cost),
-                                                                                                                                                                                                                                                                                                                           costCellTitle])),
-                                                                                                                                                                                                                                                                                                          memCellTitle]),
-                                                                                                                                                                                                                                                                                            A2(List.map,
-                                                                                                                                                                                                                                                                                               memoryControllCell,
-                                                                                                                                                                                                                                                                                               cache))))))));
+                                                                                                                                                                                                            2 * s - 4,
+                                                                                                                                                                                                            Graphics.Element.midTop)(Graphics.Element.flow(Graphics.Element.down)(_L.fromArray([A2(Graphics.Element.flow,
+                                                                                                                                                                                                                                                                                                   Graphics.Element.outward,
+                                                                                                                                                                                                                                                                                                   _L.fromArray([costCell(cost),
+                                                                                                                                                                                                                                                                                                                 costCellTitle("cost:")])),
+                                                                                                                                                                                                                                                                                                A2(Graphics.Element.flow,
+                                                                                                                                                                                                                                                                                                   Graphics.Element.outward,
+                                                                                                                                                                                                                                                                                                   _L.fromArray([costCell(mem),
+                                                                                                                                                                                                                                                                                                                 costCellTitle("mem:"),
+                                                                                                                                                                                                                                                                                                                 incMemoryButton,
+                                                                                                                                                                                                                                                                                                                 decMemoryButton]))])))))));
                                                           return A2(Graphics.Element.flow,
                                                                     Graphics.Element.right,
                                                                     _L.fromArray([titleCol,
@@ -293,7 +329,7 @@ Elm.Simulator.make = function (_elm)
                                                                                                  },
                                                                                                  _v0._1)};}
                                                   _E.Case($moduleName,
-                                                          "on line 58, column 26 to 58");
+                                                          "on line 60, column 26 to 58");
                                                 }();
                                        });
                        var contains = F2(function (_v4,i)
@@ -310,7 +346,7 @@ Elm.Simulator.make = function (_elm)
                                                                  },
                                                                  _v4._1);}
                                                     _E.Case($moduleName,
-                                                            "on line 55, column 27 to 54");
+                                                            "on line 57, column 27 to 54");
                                                   }();
                                          });
                        var load = F2(function (i,_v8)
@@ -332,13 +368,29 @@ Elm.Simulator.make = function (_elm)
                                                                                                                                                   _v8._0) < 0 ? {ctor: "_Tuple2", _0: _v8._0, _1: {ctor: "::", _0: i, _1: _v8._1}} : {ctor: "_Tuple2", _0: _v8._0, _1: {ctor: "::", _0: i, _1: A2(List.take,
                                                                                                                                                                                                                                                                                                   _v8._0 - 1,
                                                                                                                                                                                                                                                                                                   _v8._1)}};}
-                                                _E.Case($moduleName,"between lines 62 and 64");
+                                                _E.Case($moduleName,"between lines 64 and 66");
                                               }();
                                      });
                        var emptyCache = function (size)
                                         {
                                           return {ctor: "_Tuple2", _0: size, _1: _L.fromArray([])};
                                         };
+                       var jobCost = F3(function (i,j,cache)
+                                        {
+                                          return function ()
+                                                 {
+                                                   var toInt = function (b)
+                                                               {
+                                                                 return b ? 0 : 1;
+                                                               };
+                                                   return toInt(A2(contains,
+                                                                   cache,
+                                                                   i)) + toInt(_U.eq(i,
+                                                                                     j) || A2(contains,
+                                                                                              cache,
+                                                                                              j));
+                                                 }();
+                                        });
                        var cacheState = F2(function (mem,sched)
                                            {
                                              return function ()
@@ -368,30 +420,9 @@ Elm.Simulator.make = function (_elm)
                                             {
                                               return function ()
                                                      {
-                                                       var toInt = function (b)
-                                                                   {
-                                                                     return b ? 0 : 1;
-                                                                   };
-                                                       var cntMisses = F2(function (_v16,cache)
-                                                                          {
-                                                                            return function ()
-                                                                                   {
-                                                                                     switch (_v16.ctor)
-                                                                                     {case
-                                                                                      "_Tuple2" :
-                                                                                        return toInt(A2(contains,
-                                                                                                        cache,
-                                                                                                        _v16._0)) + toInt(_U.eq(_v16._0,
-                                                                                                                                _v16._1) || A2(contains,
-                                                                                                                                               cache,
-                                                                                                                                               _v16._1));}
-                                                                                     _E.Case($moduleName,
-                                                                                             "on line 39, column 13 to 75");
-                                                                                   }();
-                                                                          });
                                                        var caches = A2(cacheState,mem,sched);
                                                        return A3(List.zipWith,
-                                                                 cntMisses,
+                                                                 Basics.uncurry(jobCost),
                                                                  sched,
                                                                  caches);
                                                      }();
@@ -433,7 +464,7 @@ Elm.Simulator.make = function (_elm)
                                                                            schedule)),
                                                             Text.asText(List.sum(misses))]));
                                   }();
-                       _elm.Simulator.values = {_op: _op, main: main, cacheState: cacheState, cacheMisses: cacheMisses, totalCacheMisses: totalCacheMisses, emptyCache: emptyCache, contains: contains, remove: remove, load: load};
+                       _elm.Simulator.values = {_op: _op, main: main, cacheState: cacheState, cacheMisses: cacheMisses, jobCost: jobCost, totalCacheMisses: totalCacheMisses, emptyCache: emptyCache, contains: contains, remove: remove, load: load};
                        return _elm.Simulator.values;
                      };Elm.Schedule = Elm.Schedule || {};
 Elm.Schedule.make = function (_elm)
