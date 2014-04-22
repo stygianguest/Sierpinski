@@ -1,13 +1,15 @@
 module PerformancePlot where
 
+import Mouse
+
 import Schedule
 import Simulator(totalCacheMisses)
-import Util(signalFromList, buffer)
+import Util(signalFromList, buffer, toggleOnce)
 
 main = 
     let noStations = 64
 
-        w = 600 
+        w = 580 
         h = 300
 
         --perf sched = map (\m -> (m, totalCacheMisses m sched)) [2..noStations]
@@ -19,11 +21,30 @@ main =
         sierpDot = alpha 0.8 <| filled blue <| rect 4 4
         scanDot = alpha 0.8 <| scale 1.5 <| filled red <| polygon [(-2,-1),(2,-1),(0,2)]
 
-        plot sierpPerf scanPerf = plotCostCurves w h "mem capacity →" "cost →" [(sierpDot, sierpPerf), (scanDot, scanPerf)]
+        plot sierpPerf scanPerf st = flow outward 
+            [ plotCostCurves w h "mem capacity →" "cost →" 
+                [ (sierpDot, sierpPerf)
+                , (scanDot, scanPerf)
+                ]
+            , container w h topRight <| flow down <| map mkLegendItem 
+                [ (sierpDot, "Sierpinski schedule")
+                , (scanDot, "Scanline Schedule")
+                ]
+            , st
+            ]
 
-        clock = fps 6
+        mkLegendItem (frm,descr) = flow right [collage 15 15 [frm], plainText descr]
+        
+        playButton = container w h middle <| plainText "click to start simulation"
+        playButtonSw = switch empty playButton isRunning
 
-    in plot <~ perf sierp clock ~ perf scan clock
+        isRunning = toggleOnce Mouse.clicks
+        clock = keepWhen isRunning second (fps 6)
+
+    in plot <~ perf sierp clock ~ perf scan clock ~ playButtonSw
+
+
+switch a b = lift (\c -> if c then a else b)
 
 
 pacedMap : (a -> b) -> [a] -> Signal c -> Signal [b]
@@ -71,6 +92,7 @@ plotCostCurves w h xLabel yLabel curves =
 
         drawFormAt f (x,y) = move (toFloat x * xscale, toFloat y * yscale) f 
         costPoints = concatMap (\(f,ps) -> map (drawFormAt f) ps) curves
+
         
         moveOrigin = move (-xlen/2 + lineWidth + 2*labelHeight, -ylen/2 + lineWidth + 2*labelHeight)
 
