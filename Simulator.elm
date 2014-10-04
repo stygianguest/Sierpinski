@@ -29,7 +29,7 @@ main =
 
 cacheState : Int -> Schedule -> [Cache]
 cacheState mem sched =
-    let loadJob (i,j) = load i . load j
+    let loadJob (i,j) = load i << load j
     in scanl loadJob (emptyCache mem) sched
 
 cacheMisses : Int -> Schedule -> [Int]
@@ -43,7 +43,7 @@ jobCost i j cache =
     in toInt (cache `contains` i) + toInt (i == j || contains cache j)
 
 totalCacheMisses : Int -> Schedule -> Int
-totalCacheMisses mem = sum . cacheMisses mem
+totalCacheMisses mem = sum << cacheMisses mem
 
 
 ----

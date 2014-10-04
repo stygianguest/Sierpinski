@@ -67,7 +67,7 @@ plotCostCurves w h xLabel yLabel curves =
         yscale = (ylen - labelHeight) / toFloat maxY
 
         axesStyle = { defaultLine | width <- lineWidth, join <- Smooth, cap <- Round }
-        axeLines = group <| map (traced axesStyle . path) <| [[(0,0),(0,ylen)], [(0,0),(xlen,0)]]
+        axeLines = group <| map (traced axesStyle << path) <| [[(0,0),(0,ylen)], [(0,0),(xlen,0)]]
         
         arrowPoint = scale arrowSize <| filled black <| polygon [(0,0.7), (0.6,-0.3), (0,-0), (-0.6,-0.3)]
         axeArrows = group [move (0, ylen) arrowPoint, move (xlen, 0) <| rotate (degrees 270) arrowPoint]
@@ -86,7 +86,7 @@ plotCostCurves w h xLabel yLabel curves =
         yLabelTicks = group <| map yTick [0..noYTicks-1]
         yTickLabel i = scale 0.5 <| move (-labelHeight, toFloat i * yTickScale*2)
             <| toForm <| plainText <| show <| round <| yTickScale*2 * toFloat i / yscale
-        yTickLabels = group <| map yTickLabel <| [0..(noYTicks `div` 2) - 1]
+        yTickLabels = group <| map yTickLabel <| [0..(noYTicks // 2) - 1]
 
         axes = group [axeLines, axeArrows, xLabelForm, yLabelForm, xLabelTicks, xTickLabels, yLabelTicks, yTickLabels]
 

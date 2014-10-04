@@ -30,7 +30,7 @@ plotStaircaseGraph xscale ylen points =
         --ylen = (1+toFloat maxY) * yscale
         yscale = ylen / toFloat (maxY+1)
         --TODO: move axes by linedwidth/2 down left
-        axes = map (traced axesStyle . path) <| [[(0,0),(0,ylen)], [(0,0),(xlen,0)]]
+        axes = map (traced axesStyle << path) <| [[(0,0),(0,ylen)], [(0,0),(xlen,0)]]
         arrowpoint = scale (lineWidth*3) <| filled black <| polygon [(0,0.7), (0.6,-0.3), (0,-0), (-0.6,-0.3)]
         arrows = [move (0, ylen) arrowpoint, move (xlen, 0) <| rotate (degrees 270) arrowpoint]
         bars = map mkBar <| filter (\(x,y) -> y > 0) <| enumerate <| map snd points

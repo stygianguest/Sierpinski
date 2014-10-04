@@ -25,16 +25,16 @@ sierpinskyTriangle n =
 
 sierpinskyCurveForm =
     let pathStyle = { defaultLine | width <- 0.05, join <- Smooth, cap <- Round }
-    in traced pathStyle . path . sierpinskyCurve
-    --in group . map (\p -> move p <|filled black <| circle 0.03) . sierpinskyCurve
+    in traced pathStyle << path << sierpinskyCurve
+    --in group << map (\p -> move p <|filled black <| circle 0.03) << sierpinskyCurve
 
 sierpinskyCurve : Int -> [(Float, Float)]
 sierpinskyCurve n =
  if | n <= 0    -> [(-0.4,-0.4)]
     | otherwise -> 
         let rec = sierpinskyCurve (n-1) 
-            westTrans  = addVec (-1, 0) . rotateVec (degrees 135) . mulVec 0.7
-            southTrans = addVec (0, -1) . rotateVec (degrees -135) . mulVec 0.7
+            westTrans  = addVec (-1, 0) << rotateVec (degrees 135) << mulVec 0.7
+            southTrans = addVec (0, -1) << rotateVec (degrees -135) << mulVec 0.7
         --in map westTrans rec ++ map southTrans rec
         in reverse (map southTrans rec) ++ reverse (map westTrans rec)
 

@@ -4,6 +4,7 @@ import Char
 import String
 import Graphics.Input as Input
 import Window
+import Text
 
 import Schedule
 import Simulator
@@ -62,7 +63,7 @@ drawButtons mem sched =
     let s = buttonSize
         
         titleCell t = container s s middle <| plainText t
-        titles = map (titleCell . show) [1..noStations]
+        titles = map (titleCell << show) [1..noStations]
         titleRow = flow right titles
         titleCol = flow down <| container s s middle empty :: titles
 
@@ -80,18 +81,18 @@ drawButtons mem sched =
 
         emptyControllCell = container (s*2) s middle empty
         costCellTitle t = container (s*2) s topLeft <| leftAligned <| bold <| Text.height (s/3) <| toText t
-        costCell c = container (s*2) s bottomRight . centered . bold . Text.height s . toText <| show c
+        costCell c = container (s*2) s bottomRight << centered << bold << Text.height s << toText <| show c
         --memoryControllCell i = container (s*2) s middle <| memCellText (show i)
-        --memCellText = centered . Text.height s . toText
+        --memCellText = centered << Text.height s << toText
         --memCellTitle = container (s*2) s midBottom <| leftAligned <| Text.height (s/3) <| toText "memory:"
         incMemoryButton =
-            let filler = container (s `div` 3) (s `div` 3) middle . link "#" . centered . Text.height (s/2) . bold <| toText "+"
+            let filler = container (s // 3) (s // 3) middle << link "#" << centered << Text.height (s/2) << bold <| toText "+"
                 button = Input.customButton commands.handle IncMemory filler filler filler
-            in container (s*2 + (s `div` 2)) s topRight button
+            in container (s*2 + (s // 2)) s topRight button
         decMemoryButton =
-            let filler = container (s `div` 3) (s `div` 3) middle . link "#" . centered . Text.height (s/2) . bold <| toText "-"
+            let filler = container (s // 3) (s // 3) middle << link "#" << centered << Text.height (s/2) << bold <| toText "-"
                 button = Input.customButton commands.handle DecMemory filler filler filler
-            in container (s*2 + (s `div` 2)) s midRight button
+            in container (s*2 + (s // 2)) s midRight button
 
         controlsWidth = 3*s
         controlsHeight = (noStations+2) * s
