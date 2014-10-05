@@ -48,8 +48,8 @@ squareI n = triangleI n ++ rightS :: map rotate180cw (triangleI <| n)
 closestGen : Int -> Int
 closestGen n = floor (logBase 2 <| toFloat n) - 2 
 
-hindex = scanl addSteps (1,1) . squareH . closestGen
-sierpinski = scanl addSteps (1,1) . sierpTriangle . closestGen
+hindex = scanl addSteps (1,1)<<squareH<<closestGen
+sierpinski = scanl addSteps (1,1)<<sierpTriangle<<closestGen
 
 -----
 
@@ -79,7 +79,7 @@ orderJobs = map orderJob
 orderJob (i,j) = if i >= j then (i,j) else (j,i)
 
 noJobs : Int -> Int
-noJobs noStations = ((noStations * noStations - noStations) `div` 2) + noStations
+noJobs noStations = ((noStations * noStations - noStations) // 2) + noStations
    
 append : Job -> Schedule -> Schedule
 append (i,j) sched = 
@@ -108,8 +108,8 @@ drawScheduleWithIndex jobDist noStations sched =
         w = ceiling jobDist
 
         mkCell = container w w middle
-        titleColumn = flow down <| map (mkCell . plainText . show) [1..noStations]
-        titleRow = flow right <| mkCell (spacer w w) :: map (mkCell . plainText . show) [1..noStations]
+        titleColumn = flow down <| map (mkCell<<plainText<<show) [1..noStations]
+        titleRow = flow right <| mkCell (spacer w w) :: map (mkCell<<plainText<<show) [1..noStations]
 
     in titleRow `above` (titleColumn `beside` path `beside` titleColumn) `above` titleRow
 
@@ -124,7 +124,7 @@ drawSchedule jobDist noStations sched =
         coords = map jobCoords sched
         jobNumber (n,p) = move p <| group 
             [filled black <| circle (jobDist/3), filled white <| circle (jobDist/3 - lineWidth), jobLabel n]
-        jobLabel = scale (jobDist/40) . toForm . plainText . show
+        jobLabel = scale (jobDist/40)<<toForm<<plainText<<show
         jobs = map jobNumber (enumerate coords)
     in collage (ceiling elemSize) (ceiling elemSize) (schedPath :: jobs)
 
@@ -139,6 +139,6 @@ drawSchedule jobDist noStations sched =
 --        coords = map jobCoords sched
 --        jobNumber (n,p) = move p <| group 
 --            [filled black <| circle (xstep/3), filled white <| circle (xstep/3 - lineWidth), jobLabel n]
---        jobLabel = scale (xstep/40) . toForm . plainText . show
+--        jobLabel = scale (xstep/40)<<toForm<<plainText<<show
 --        jobs = map jobNumber (enumerate coords)
 --    in collage w h (schedPath :: jobs)

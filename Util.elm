@@ -3,7 +3,7 @@ module Util where
 import Random
 import Dict
 import Set
-
+import Maybe (isJust)
 import Transform2D(..)
 
 --------------------------------------------------------------------------------
@@ -15,17 +15,17 @@ import Transform2D(..)
 --FIXME: it seems Dict.values returns values in-order, but it's not documented
 shuffle : Signal [a] -> Signal [a]
 shuffle cards = 
-    let cardsDict = Dict.fromList . enumerate <~ cards
+    let cardsDict = Dict.fromList << enumerate <~ cards
         cardCnt = length <~ cards
         floatToRange (x,y) = (x, floor <| y * (toFloat <| x+1))
-        swapPairs = reverse . map floatToRange . enumerate <~ Random.floatList cardCnt
-        applySwaps cdict = foldl (<|) cdict . map (uncurry swap)
+        swapPairs = reverse << map floatToRange << enumerate <~ Random.floatList cardCnt
+        applySwaps cdict = foldl (<|) cdict << map (uncurry swap)
     in Dict.values <~ (applySwaps <~ cardsDict ~ swapPairs)
 
 swap : comparable -> comparable -> Dict.Dict comparable a -> Dict.Dict comparable a
 swap keyX keyY dct = 
-    let valX = fromJust <| Dict.lookup keyX dct
-        valY = fromJust <| Dict.lookup keyY dct
+    let valX = fromJust <| Dict.get keyX dct
+        valY = fromJust <| Dict.get keyY dct
     in Dict.insert keyX valY <| Dict.insert keyY valX dct
 
 rangeList : Int -> Int -> Signal Int -> Signal [Int]
@@ -45,12 +45,12 @@ rangeList from to len =
 loadingAnimation : Signal Bool -> Signal Form
 loadingAnimation isVisible =
     let circles = map mkcircle [0..5]
-        mkcircle i = groupTransform (transform i) . singleton <| solid black `outlined` circle 2
+        mkcircle i = groupTransform (transform i) << singleton <| solid black `outlined` circle 2
         singleton x = [x]
         transform i = rotation (degrees <| i * 60) `multiply` translation 0 7
 
         rotateLoader a = groupTransform (rotation -a) circles
-        angle = degrees . (\a->a*1.5) . toFloat <~ modCount 360 clock
+        angle = degrees << (\a->a*1.5) << toFloat <~ modCount 360 clock
         clock = keepWhen isVisible millisecond (fps 30) 
 
         emptyForm = group []
@@ -64,13 +64,13 @@ loadingAnimation isVisible =
 --unionWith : (Maybe a -> Maybe b -> c) -> Dict.Dict comparable a -> Dict.Dict comparable b -> Dict.Dict comparable c
 --unionWith cmb dictA dictB =
 --    let allKeys =  Set.toList <| Set.fromList (Dict.keys dictA) `Set.union` Set.fromList (Dict.keys dictB)
---        insertCombined k = Dict.insert k <| cmb (Dict.lookup k dictA) (Dict.lookup k dictB)
+--        insertCombined k = Dict.insert k <| cmb (Dict.get k dictA) (Dict.get k dictB)
 --    in foldl insertCombined Dict.empty allKeys
 
 zipDict : Dict.Dict comparable a -> Dict.Dict comparable b -> Dict.Dict comparable (a,b)
 zipDict dictA dictB =
     let allKeys =  Set.toList <| Set.fromList (Dict.keys dictA) `Set.intersect` Set.fromList (Dict.keys dictB)
-        insertCombined k = Dict.insert k (fromJust <| Dict.lookup k dictA, fromJust <| Dict.lookup k dictB)
+        insertCombined k = Dict.insert k (fromJust <| Dict.get k dictA, fromJust <| Dict.get k dictB)
     in foldl insertCombined Dict.empty allKeys
 
 --------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ muc switch init a b =
 
 modCount : Int -> Signal a -> Signal Int
 modCount m =
-    let add _ a = (a + 1) `mod` m
+    let add _ a = (a + 1) % m
     in foldp add 0
 
 
@@ -117,7 +117,7 @@ iterateOn f = foldp (\a b -> f b)
 
 signalFromList : [a] -> Signal b -> Signal a
 signalFromList lst =
-    lift head . dropIf isEmpty lst . foldp (\_ -> tail) (head lst :: lst)
+    lift head<<dropIf isEmpty lst<<foldp (\_ -> tail) (head lst :: lst)
 
 buffer : Signal a -> Signal [a]
 buffer = foldp (::) []
